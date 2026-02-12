@@ -92,17 +92,14 @@
    ========================================================= */
 
 .gallery__grid{
-	--gal-gap: 18px;
-	--gal-row: 245px;
-
 	margin-top: 34px;
 
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: var(--gal-gap);
+	gap: var(--gallery-grid-gap);
 
 	grid-auto-flow: dense;
-	grid-auto-rows: var(--gal-row);
+	grid-auto-rows: var(--gallery-grid-row-h);
 }
 
 .gallery__item{
@@ -132,7 +129,6 @@
 @media (max-width: 1024px){
 	.gallery__grid{
 		grid-template-columns: repeat(2, 1fr);
-		--gal-row: 220px;
 		gap: 14px;
 		margin-top: 28px;
 	}
@@ -259,10 +255,6 @@
 	color: #fff;
 }
 
-:root{
-	--lb-half-w: min(600px, 46vw);
-}
-
 /* =========================================================
    CLOSE (X) — NIE ZMIENIAM POZYCJI, tylko centrowanie znaku
    ========================================================= */
@@ -270,7 +262,7 @@
 .flx-lightbox__close{
 	position: fixed;
 	top: calc(50% - (82vh / 2) - 12px);
-	left: calc(53% + var(--lb-half-w) - 52px);
+	left: calc(53% + var(--gallery-lightbox-half-w) - 52px);
 
 	width: 44px;
 	height: 44px;
@@ -340,11 +332,11 @@
 }
 
 .flx-lightbox__arrow--prev{
-	left: calc(50% - var(--lb-half-w) - 66px);
+	left: calc(50% - var(--gallery-lightbox-half-w) - 66px);
 }
 
 .flx-lightbox__arrow--next{
-	left: calc(50% + var(--lb-half-w) + 14px);
+	left: calc(50% + var(--gallery-lightbox-half-w) + 14px);
 }
 
 @media (max-width: 640px){
@@ -357,22 +349,19 @@
 		max-height: 76vh;
 	}
 
-	:root{
-		--lb-half-w: 47vw;
-	}
 
 	/* NIE ZMIENIAM Twoich wartości (nawet jeśli są "dziwne") */
 	.flx-lightbox__close{
 		top: calc(66% - (76vh / 2) - 10px);
-		left: calc(50% + var(--lb-half-w) - 44px);
+		left: calc(50% + var(--gallery-lightbox-half-w) - 44px);
 	}
 
 	.flx-lightbox__arrow--prev{
-		left: calc(64% - var(--lb-half-w) - 56px);
+		left: calc(64% - var(--gallery-lightbox-half-w) - 56px);
 	}
 
 	.flx-lightbox__arrow--next{
-		left: calc(31% + var(--lb-half-w) + 21px);
+		left: calc(31% + var(--gallery-lightbox-half-w) + 21px);
 	}
 }
 
