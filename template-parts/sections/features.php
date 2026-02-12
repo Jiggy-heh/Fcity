@@ -14,66 +14,66 @@
  * - url_btn (URL)
  */
 
-$label   = get_field('label_usp');
-$title   = get_field('usp_title');
-$btn_txt = get_field('usp_btn');
-$btn_url = get_field('url_btn');
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+$section_label = get_field( 'label_usp' );
+$section_title = get_field( 'usp_title' );
+$button_text   = get_field( 'usp_btn' );
+$button_url    = get_field( 'url_btn' );
 ?>
 
 <div class="features">
 	<div class="container">
 
-
-		<?php if ($label) : ?>
+		<?php if ( ! empty( $section_label ) ) : ?>
 			<div class="section-label">
-				<p class="section-label__text"><?php echo esc_html($label); ?></p>
+				<p class="section-label__text"><?php echo esc_html( $section_label ); ?></p>
 				<span class="section-label__line" aria-hidden="true"></span>
 			</div>
 		<?php endif; ?>
 
-		<?php if ($title) : ?>
-			<h2 class="section-title"><?php echo esc_html($title); ?></h2>
+		<?php if ( ! empty( $section_title ) ) : ?>
+			<h2 class="section-title"><?php echo esc_html( $section_title ); ?></h2>
 		<?php endif; ?>
 
-		<?php if (have_rows('features')) : ?>
+		<?php if ( have_rows( 'features' ) ) : ?>
 			<div class="features__grid">
 
-				<?php while (have_rows('features')) : the_row(); ?>
+				<?php while ( have_rows( 'features' ) ) : the_row(); ?>
 					<?php
-						$item_icon  = get_sub_field('usp_icon');
-						$item_title = get_sub_field('usp_title');
-						$item_desc  = get_sub_field('usp_desc');
+					$item_icon  = get_sub_field( 'usp_icon' );
+					$item_title = get_sub_field( 'usp_title' );
+					$item_desc  = get_sub_field( 'usp_desc' );
+					$icon_id    = is_array( $item_icon ) && isset( $item_icon['ID'] ) ? (int) $item_icon['ID'] : 0;
+					$icon_alt   = is_array( $item_icon ) && isset( $item_icon['alt'] ) ? (string) $item_icon['alt'] : '';
 					?>
 
 					<div class="features__item">
-						<?php if (!empty($item_icon)) : ?>
+						<?php if ( $icon_id ) : ?>
 							<div class="features__icon">
 								<?php
-									$icon_id  = is_array($item_icon) && isset($item_icon['ID']) ? (int) $item_icon['ID'] : 0;
-									$icon_alt = is_array($item_icon) && isset($item_icon['alt']) ? $item_icon['alt'] : '';
-
-									if ($icon_id) {
-										echo wp_get_attachment_image(
-											$icon_id,
-											'full',
-											false,
-											[
-												'alt'     => esc_attr($icon_alt),
-												'loading' => 'lazy',
-											]
-										);
-									}
+								echo wp_get_attachment_image(
+									$icon_id,
+									'full',
+									false,
+									[
+										'alt'     => esc_attr( $icon_alt ),
+										'loading' => 'lazy',
+									]
+								);
 								?>
 							</div>
 						<?php endif; ?>
 
 						<div class="features__content">
-							<?php if ($item_title) : ?>
-								<h3 class="features__title"><?php echo esc_html($item_title); ?></h3>
+							<?php if ( ! empty( $item_title ) ) : ?>
+								<h3 class="features__title"><?php echo esc_html( $item_title ); ?></h3>
 							<?php endif; ?>
 
-							<?php if ($item_desc) : ?>
-								<p class="features__desc"><?php echo esc_html($item_desc); ?></p>
+							<?php if ( ! empty( $item_desc ) ) : ?>
+								<p class="features__desc"><?php echo esc_html( $item_desc ); ?></p>
 							<?php endif; ?>
 						</div>
 					</div>
@@ -83,10 +83,10 @@ $btn_url = get_field('url_btn');
 			</div>
 		<?php endif; ?>
 
-		<?php if ($btn_txt && $btn_url) : ?>
+		<?php if ( ! empty( $button_text ) && ! empty( $button_url ) ) : ?>
 			<div class="features__cta">
-				<a class="btn btn--primary btn--fixed" href="<?php echo esc_url($btn_url); ?>">
-					<span class="btn__text"><?php echo esc_html($btn_txt); ?></span>
+				<a class="btn btn--primary btn--fixed" href="<?php echo esc_url( $button_url ); ?>">
+					<span class="btn__text"><?php echo esc_html( $button_text ); ?></span>
 					<span class="btn__icon btn__icon--arrow" aria-hidden="true"></span>
 				</a>
 			</div>

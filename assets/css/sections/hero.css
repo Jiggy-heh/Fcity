@@ -3,40 +3,6 @@
    Pod markup z hero.php
    ========================================================= */
 
-:root {
-	--hero-height: 970px;
-
-	/* Text shadow (TYLKO TEKST) */
-	--hero-text-shadow: 0px 4px 14px rgba(0, 0, 0, 0.75);
-
-	/* Spacing */
-	--hero-pad-top: 80px; /* menu -> title (TYLKO LEWA KOLUMNA) */
-	--hero-gap-subtitle-desc: 35px;
-	--hero-gap-desc-highlight: 110px;
-	--hero-gap-highlight-usp: 35px;
-	--hero-pad-bottom: 100px;
-
-	/* Form box */
-	--hero-form-w: 566px;
-	--hero-form-h: 593px;
-	--hero-form-top: 50px; /* menu -> box (prawa kolumna) */
-	--hero-form-border-bottom: 10px;
-	--hero-form-radius: 5px;
-
-	/* “dowiedz się więcej” */
-	--hero-more-gap-from-form: 25px;
-	--hero-more-w: 172px;
-	--hero-more-h: 80px;
-
-	/* USP */
-	--hero-usp-icon-w: 44px;
-	--hero-usp-icon-h: 55px;
-	--hero-usp-col-gap: 30px;
-
-	/* CF7 widths */
-	--fc-form-w: 446px;
-	--fc-input-h: 42px;
-}
 
 
 
@@ -483,16 +449,6 @@
    ========================================================= */
 
 @media (max-width: 640px) {
-	:root {
-		--hero-pad-top: 0px;
-		--hero-pad-bottom: 40px;
-
-		--hero-gap-subtitle-desc: 18px;
-		--hero-gap-desc-highlight: 32px;
-		--hero-gap-highlight-usp: 20px;
-
-		--hero-form-top: 0px;
-	}
 
 	/* ✅ klucz: hero ma mieć wysokość tła */
 	.hero {
