@@ -1,23 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
+	const faqRoots = document.querySelectorAll('[data-faq]');
+	if (!faqRoots.length) return;
 
-	const faqContainers = document.querySelectorAll('[data-faq]');
-	if (!faqContainers.length) return;
+	faqRoots.forEach(function (faqRoot) {
+		faqRoot.addEventListener('click', function (event) {
+			const questionButton = event.target.closest('.faq__question');
+			if (!questionButton) return;
 
-	faqContainers.forEach(function (root) {
+			const faqItem = questionButton.closest('.faq__item');
+			if (!faqItem) return;
 
-		root.addEventListener('click', function (e) {
-
-			const btn = e.target.closest('.faq__question');
-			if (!btn) return;
-
-			const item = btn.closest('.faq__item');
-			if (!item) return;
-
-			const isOpen = item.classList.toggle('is-open');
-			btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-
+			const isOpen = faqItem.classList.toggle('is-open');
+			questionButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 		});
-
 	});
-
 });

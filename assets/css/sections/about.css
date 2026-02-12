@@ -3,27 +3,6 @@
    Pod markup z about.php
    ========================================================= */
 
-:root {
-	/* Layout */
-	--about-img-pad: 62px;
-	--about-col-gap: 20px;
-	--about-row-gap: 135px;
-
-	/* REALNE wymiary z WP */
-	--about-img-left-w: 663px;
-	--about-img-left-h: 674px;
-
-	--about-img-right-w: 625px;
-	--about-img-right-h: 720px;
-
-	/* ✅ kolumny w grid = szerokość OBRAZU (bez paddingu) */
-	--about-media-left-w: var(--about-img-left-w);
-	--about-media-right-w: var(--about-img-right-w);
-
-	/* Desc typography (sekcyjnie) */
-	--about-desc-size: 20px;
-	--about-desc-line: 145%;
-}
 
 /* Sekcja */
 .about {
@@ -128,10 +107,6 @@
 .about__desc > *:last-child { margin-bottom: 0; }
 .about__desc p { margin: 0 0 14px 0; }
 
-/* CTA (systemowy .btn w config.css) */
-.about__btn {
-	margin-top: 40px;
-}
 
 /* =========================================================
    RESPONSIVE
@@ -166,8 +141,3 @@
 	}
 }
 
-@media (max-width: 640px) {
-	:root {
-		--about-desc-size: 18px;
-	}
-}

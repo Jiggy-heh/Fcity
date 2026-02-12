@@ -77,6 +77,46 @@
 	--section-title-size: 48px;
 	--section-title-line: 55px;
 	--section-title-weight: 700;
+
+	/* About */
+	--about-img-pad: 62px;
+	--about-col-gap: 20px;
+	--about-row-gap: 135px;
+	--about-img-left-w: 663px;
+	--about-img-left-h: 674px;
+	--about-img-right-w: 625px;
+	--about-img-right-h: 720px;
+	--about-media-left-w: var(--about-img-left-w);
+	--about-media-right-w: var(--about-img-right-w);
+	--about-desc-size: 20px;
+	--about-desc-line: 145%;
+
+	/* Hero */
+	--hero-height: 970px;
+	--hero-text-shadow: 0px 4px 14px rgba(0, 0, 0, 0.75);
+	--hero-pad-top: 80px;
+	--hero-gap-subtitle-desc: 35px;
+	--hero-gap-desc-highlight: 110px;
+	--hero-gap-highlight-usp: 35px;
+	--hero-pad-bottom: 100px;
+	--hero-form-w: 566px;
+	--hero-form-h: 593px;
+	--hero-form-top: 50px;
+	--hero-form-border-bottom: 10px;
+	--hero-form-radius: 5px;
+	--hero-more-gap-from-form: 25px;
+	--hero-more-w: 172px;
+	--hero-more-h: 80px;
+	--hero-usp-icon-w: 44px;
+	--hero-usp-icon-h: 55px;
+	--hero-usp-col-gap: 30px;
+	--fc-form-w: 446px;
+	--fc-input-h: 42px;
+
+	/* Gallery */
+	--gallery-grid-gap: 18px;
+	--gallery-grid-row-h: 245px;
+	--gallery-lightbox-half-w: min(600px, 46vw);
 }
 
 
@@ -222,6 +262,7 @@ svg {
 @media (max-width: 1024px) {
 	:root {
 		--container-pad: 20px;
+		--gallery-grid-row-h: 220px;
 	}
 
 	.section {
@@ -233,6 +274,14 @@ svg {
 @media (max-width: 640px) {
 	:root {
 		--container-pad: 16px;
+		--about-desc-size: 18px;
+		--hero-pad-top: 0px;
+		--hero-pad-bottom: 40px;
+		--hero-gap-subtitle-desc: 18px;
+		--hero-gap-desc-highlight: 32px;
+		--hero-gap-highlight-usp: 20px;
+		--hero-form-top: 0px;
+		--gallery-lightbox-half-w: 47vw;
 	}
 
 	.section {
