@@ -281,6 +281,7 @@ add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_assets' );
 require get_template_directory() . '/inc/post-types/inwestycje.php';
 
 
+
 //* Scroll menu */
 function flixcity_enqueue_lp_scripts() {
 

@@ -107,10 +107,6 @@
 .about__desc > *:last-child { margin-bottom: 0; }
 .about__desc p { margin: 0 0 14px 0; }
 
-/* CTA (systemowy .btn w config.css) */
-.about__btn {
-	margin-top: 40px;
-}
 
 /* =========================================================
    RESPONSIVE
