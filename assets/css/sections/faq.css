@@ -1,0 +1,205 @@
+/* =========================================================
+   FAQ — faq.css
+   ========================================================= */
+
+.faq{
+	background: transparent;
+}
+
+/* =========================================================
+   HEAD (label/title) — 1:1 jak gallery.css
+   ========================================================= */
+
+.faq__head{
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.faq__head-left{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	flex: 1;
+}
+
+.faq__head-left .section-label{
+	justify-content: center;
+	width: 100%;
+}
+
+.faq__head-left .section-title{
+	margin-top: 25px; /* wymagane 25px */
+	text-align: center;
+}
+
+/* =========================================================
+   LIST (karty)
+   ========================================================= */
+
+.faq__list{
+	margin-top: 34px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.faq__item{
+	background: rgba(232, 225, 243, 0.23); /* #E8E1F34A / 23% */
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+/* =========================================================
+   QUESTION (trigger) — padding STAŁY, żeby nie skakało
+   ========================================================= */
+
+.faq__question{
+	width: 100%;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+
+	padding: 20px; /* stałe 20px zawsze */
+	text-align: left;
+}
+
+.faq__left{
+	display: inline-flex;
+	align-items: center;
+	gap: 14px;
+	min-width: 0;
+}
+
+.faq__num{
+	font-family: var(--font-family-base);
+	font-weight: 700;
+	font-size: 20px;
+	line-height: 145%;
+	letter-spacing: 0;
+	color: var(--color-grey);
+	white-space: nowrap;
+}
+
+.faq__qtext{
+	font-family: var(--font-family-base);
+	font-weight: 700;
+	font-size: 20px;
+	line-height: 145%;
+	letter-spacing: 0;
+	color: var(--color-grey);
+
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Arrow (SVG switch) */
+.faq__arrow{
+	width: 24px;
+	height: 24px;
+	flex: 0 0 24px;
+
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+
+	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/faq_normal_arrow.svg");
+}
+
+.faq__item.is-open .faq__arrow{
+	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/faq_active_arrow.svg");
+}
+
+/* =========================================================
+   ANSWER (WYSIWYG)
+   - “10px wewnętrzny padding” robimy tutaj, bez ruszania question
+   ========================================================= */
+
+.faq__answer{
+	display: none;
+	padding: 10px 20px 20px 20px; /* 10px wewnątrz przy otwartym (bez skoku) */
+}
+
+.faq__item.is-open .faq__answer{
+	display: block;
+}
+
+.faq__acontent{
+	font-family: var(--font-family-base);
+	font-weight: 300;
+	font-size: 20px;
+	line-height: 145%;
+	letter-spacing: 0;
+	color: var(--color-grey);
+}
+
+.faq__acontent p{
+	margin: 0 0 12px 0;
+}
+
+.faq__acontent p:last-child{
+	margin-bottom: 0;
+}
+
+.faq__acontent ul,
+.faq__acontent ol{
+	margin: 0 0 12px 20px;
+}
+
+/* =========================================================
+   RESPONSIVE — jak w galerii
+   ========================================================= */
+
+@media (max-width: 1024px){
+	.faq__list{
+		margin-top: 28px;
+	}
+}
+
+@media (max-width: 640px){
+	.faq__head{
+		align-items: center;
+	}
+
+	.faq__head-left{
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	.faq__head-left .section-label{
+		justify-content: flex-start;
+	}
+
+	.faq__head-left .section-label__line{
+		left: auto;
+		transform: none;
+	}
+
+	.faq__head-left .section-title{
+		text-align: left;
+	}
+
+	.faq__list{
+		margin-top: 18px;
+		gap: 14px;
+	}
+
+	.faq__num,
+	.faq__qtext,
+	.faq__acontent{
+		font-size: 18px;
+	}
+
+	.faq__qtext{
+		white-space: normal;
+	}
+}

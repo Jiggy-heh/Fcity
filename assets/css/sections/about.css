@@ -1,0 +1,173 @@
+/* =========================================================
+   ABOUT — about.css (CLEAN, zgodny z HERO / config.css)
+   Pod markup z about.php
+   ========================================================= */
+
+:root {
+	/* Layout */
+	--about-img-pad: 62px;
+	--about-col-gap: 20px;
+	--about-row-gap: 135px;
+
+	/* REALNE wymiary z WP */
+	--about-img-left-w: 663px;
+	--about-img-left-h: 674px;
+
+	--about-img-right-w: 625px;
+	--about-img-right-h: 720px;
+
+	/* ✅ kolumny w grid = szerokość OBRAZU (bez paddingu) */
+	--about-media-left-w: var(--about-img-left-w);
+	--about-media-right-w: var(--about-img-right-w);
+
+	/* Desc typography (sekcyjnie) */
+	--about-desc-size: 20px;
+	--about-desc-line: 145%;
+}
+
+/* Sekcja */
+.about {
+	width: 100%;
+}
+
+/* ✅ ten sam wrapper co hero__content (grid 1360) */
+.about__inner {
+	max-width: var(--container-max);
+	margin: 0 auto;
+	padding-left: var(--container-pad);
+	padding-right: var(--container-pad);
+}
+
+/* Rows */
+.about__row {
+	display: grid;
+	align-items: start;
+	column-gap: var(--about-col-gap);
+}
+
+/* Row 1: media + content */
+.about__row--top {
+	grid-template-columns: var(--about-media-left-w) 1fr;
+}
+
+/* Row 2: content + media */
+.about__row--bottom {
+	grid-template-columns: 1fr var(--about-media-right-w);
+	margin-top: var(--about-row-gap);
+}
+
+/* =========================================================
+   MEDIA
+   - padding 62px ma być TYLKO OD ŚRODKA (między obrazem i tekstem)
+   - dlatego:
+     * lewy obraz: padding po PRAWEJ
+     * prawy obraz: padding po LEWEJ
+   ========================================================= */
+
+.about__media {
+	box-sizing: border-box;
+	padding: 0; /* reset */
+}
+
+/* LEWY obraz: dochodzi do lewego marginesu gridu */
+.about__media--left {
+	padding: 0 var(--about-img-pad) 0 0;
+}
+
+/* PRAWY obraz: dochodzi do prawego marginesu gridu */
+.about__media--right {
+	padding: 0 0 0 var(--about-img-pad);
+}
+
+/* Image */
+.about__img {
+	display: block;
+	object-fit: cover;
+}
+
+/* LEFT img */
+.about__img--left {
+	width: var(--about-img-left-w);
+	height: var(--about-img-left-h);
+}
+
+/* RIGHT img */
+.about__img--right {
+	width: var(--about-img-right-w);
+	height: var(--about-img-right-h);
+}
+
+/* ✅ prawa kolumna row 1: start wyrównany do obrazu (62px) */
+.about__col--right {
+	padding-top: var(--about-img-pad);
+}
+
+/* ✅ spacing: label -> title (globalna typografia jest w config.css) */
+.about .section-title {
+	margin-top: 25px;
+}
+
+/* CTA (systemowy .btn w config.css) */
+.about__btn{
+	margin-top: 40px;
+}
+
+
+/* Desc */
+.about__desc {
+	margin-top: 30px;
+	font-family: var(--font-family-base);
+	font-weight: 400;
+	font-size: var(--about-desc-size);
+	line-height: var(--about-desc-line);
+	letter-spacing: 0;
+	color: var(--color-grey);
+}
+
+.about__desc > *:first-child { margin-top: 0; }
+.about__desc > *:last-child { margin-bottom: 0; }
+.about__desc p { margin: 0 0 14px 0; }
+
+/* CTA (systemowy .btn w config.css) */
+.about__btn {
+	margin-top: 40px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+	.about__row--top,
+	.about__row--bottom {
+		grid-template-columns: 1fr;
+		row-gap: 24px;
+	}
+
+	.about__row--bottom {
+		margin-top: 80px;
+	}
+
+	.about__col--right {
+		padding-top: 0;
+	}
+
+	/* Na mobile/tablet nie robimy “ramki” */
+	.about__media--left,
+	.about__media--right {
+		padding: 0;
+	}
+
+	.about__img--left,
+	.about__img--right {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 10;
+	}
+}
+
+@media (max-width: 640px) {
+	:root {
+		--about-desc-size: 18px;
+	}
+}

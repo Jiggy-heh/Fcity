@@ -1,0 +1,345 @@
+/* =========================================================
+   LOCATION — sekcja lokalizacja
+   ========================================================= */
+
+/* text shadow jak HERO, tylko copy */
+.location .section-label__text,
+.location .section-title,
+.location__bullets,
+.location__bullets p,
+.location__bullets li,
+.location__usp-title,
+.location__usp-desc{
+	text-shadow: var(--hero-text-shadow);
+}
+
+.location{
+	
+}
+
+.section.location{
+	height: 985px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: 50% 100%;
+}
+
+
+
+/* Grid */
+.location__grid{
+	display: grid;
+	grid-template-columns: 1fr 650px;
+	gap: 30px;
+	align-items: center;
+	height: 100%;
+	transform: translateY(80px);
+}
+
+/* Label + Title (z config.css) */
+.location .section-label__text,
+.location .section-title{
+	color: var(--color-third);
+}
+
+.location .section-label__line{
+	background-color: var(--color-third);
+}
+
+/* 25px między label a title */
+.location .section-title{
+	margin-top: 25px;
+	width: 720px;
+}
+
+/* Bullet points */
+.location__bullets{
+	margin-top: 30px;
+	color: var(--color-third);
+}
+
+.location__bullets p,
+.location__bullets li{
+	margin: 0 0 16px;
+	font-family: var(--font-family-base);
+	font-weight: 300;
+	font-size: 20px;
+	line-height: 10px;
+	letter-spacing: 0;
+	color: var(--color-third);
+}
+
+/* (opcjonalnie) jeśli bullets są w UL */
+.location__bullets ul{
+	margin: 0;
+	padding-left: 22px;
+}
+
+/* Wyróżniki */
+.location__usps{
+	margin-top: 30px;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0,1fr));
+	gap: 10px 0px;
+	color: var(--color-third);
+}
+
+.location__usp-title{
+	margin: 0;
+	font-family: var(--font-family-base);
+	font-weight: 700;
+	font-size: 46px;
+	line-height: 145%;
+	letter-spacing: 0;
+	color: var(--color-third);
+}
+
+.location__usp-desc{
+	margin: 6px 0 0;
+}
+
+/* CTA */
+.location__cta{
+	position: relative;
+	margin-top: 35px;
+}
+
+.location__cta-inner{
+	position: absolute;
+	top: 0px;
+	left: 0;
+	display: flex;
+	gap: 165px;
+}
+
+/* =========================================================
+   BUTTONS — używamy globalnego .btn, tylko nadpisujemy kolory
+   ========================================================= */
+
+/* LEFT (ma wyglądać jak secondary) */
+.location__btn-left{
+	background: var(--color-secondary);
+	color: var(--color-primary);
+	border: 2px solid transparent; /* żeby hover nie skakał */
+}
+
+.location__btn-left:hover{
+	background: var(--color-third);
+	border-color: var(--color-third);
+	color: var(--color-primary);
+}
+
+/* RIGHT (ma wyglądać jak third) */
+.location__btn-right{
+	background: var(--color-third);
+	color: var(--color-primary);
+	border: 2px solid transparent; /* żeby hover nie skakał */
+}
+
+.location__btn-right:hover{
+	background: var(--color-secondary);
+	border-color: var(--color-secondary);
+	color: var(--color-primary);
+}
+
+
+/* ================= RIGHT / MAP ================= */
+
+.location__map-wrap{
+	position: relative;
+	width: 650px;
+}
+
+/* 2 paski nad mapą */
+.location__line-long{
+	position: absolute;
+	top: -9px;
+	right: 50px;
+	z-index: 2;
+}
+
+.location__line-short{
+	position: absolute;
+	top: -25px;
+	right: 0;
+	transform: translateY(7px);
+	z-index: 2;
+}
+
+/* Box mapy */
+.location__map{
+	width: 560px;
+	height: 620px;
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+	background: #fff;
+}
+
+/* Iframe */
+.location__map iframe{
+	width: 100%;
+	height: 100%;
+	border: 0;
+	display: block;
+}
+
+/* Pasek pod mapą */
+.location__map-bar{
+	height: 20px;
+	background: var(--color-secondary);
+	width: 560px;
+	border-radius: 0 0 2px 2px;
+}
+
+/* =========================================================
+   RESPONSIVE — LOCATION
+   ========================================================= */
+
+@media (max-width: 1200px){
+	.location{
+		height: auto;
+	}
+
+	.location__grid{
+		grid-template-columns: 1fr;
+		gap: 40px;
+		align-items: start;
+		height: auto;
+	}
+
+	.location .section-title{
+		width: auto;
+		max-width: 100%;
+	}
+
+	.location__map-wrap{
+		width: 100%;
+	}
+
+	.location__map{
+		width: 100%;
+		height: auto;
+		aspect-ratio: 650 / 620;
+	}
+
+	.location__map-bar{
+		width: 100%;
+	}
+
+	.location__cta-inner{
+		position: static;
+		gap: 20px;
+		flex-wrap: wrap;
+	}
+}
+
+@media (max-width: 640px){
+	.location__bullets{
+		margin-top: 22px;
+	}
+
+	.location__bullets p,
+	.location__bullets li{
+		font-size: 16px;
+		line-height: 145%;
+	}
+
+	.location__usps{
+		grid-template-columns: 1fr;
+		gap: 18px;
+		margin-top: 22px;
+	}
+
+	.location__usp-title{
+		font-size: 28px;
+		line-height: 120%;
+	}
+
+	.location__cta{
+		margin-top: 24px;
+	}
+
+	.location__cta-inner{
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+}
+
+
+/* =========================================================
+   FIX: Location overflow na mobile (mapa nie wchodzi w galerię)
+   ========================================================= */
+
+@media (max-width: 1200px){
+	.section.location{
+		height: auto;              /* ważne: sekcja rośnie */
+		padding-top: var(--section-space);
+		padding-bottom: var(--section-space);
+	}
+
+	.location__grid{
+		transform: none;           /* ważne: usuń zrzut w dół */
+	}
+}
+
+@media (max-width: 640px){
+	.section.location{
+		padding-top: var(--section-space-sm);
+		padding-bottom: var(--section-space-sm);
+	}
+
+	/* jeśli chcesz nadal “niżej” content na mobile, rób to paddingiem */
+	.location__grid{
+		padding-top: 24px;         /* reguluj */
+	}
+}
+
+@media (max-width: 640px){
+	.section.location{
+		background-position: 49% 75%;
+	}
+}
+
+
+
+/* =========================================================
+   LOCATION — arrow color sync z kolorem textu
+   ========================================================= */
+
+/* domyślnie arrow = color-primary (jak text) */
+.location__btn-left .btn__icon--arrow,
+.location__btn-right .btn__icon--arrow{
+	filter: brightness(0) saturate(100%) invert(18%) sepia(35%) saturate(1180%) hue-rotate(230deg);
+}
+
+/* LEFT hover — nadal color-primary */
+.location__btn-left:hover .btn__icon--arrow{
+	filter: brightness(0) saturate(100%) invert(18%) sepia(35%) saturate(1180%) hue-rotate(230deg);
+}
+
+/* RIGHT hover — nadal color-primary */
+.location__btn-right:hover .btn__icon--arrow{
+	filter: brightness(0) saturate(100%) invert(18%) sepia(35%) saturate(1180%) hue-rotate(230deg);
+}
+
+/* =========================================================
+   FIX: overflow tylko na mobile/tablet (desktop może wystawać)
+   ========================================================= */
+
+@media (max-width: 1200px){
+	/* przycinamy wszystko co wystaje z mapy (linie/box) */
+	.location__map-wrap{
+		overflow: hidden; /* albo overflow: clip; jeśli wolisz */
+	}
+
+	/* linie nie mogą wychodzić poza wrapper */
+	.location__line-long{
+		right: 16px;
+	}
+
+	.location__line-short{
+		right: 0;
+	}
+}

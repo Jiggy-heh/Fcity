@@ -1,0 +1,366 @@
+/* =========================================================
+   flixcity-theme — config.css (Design System) — CLEAN (Variant A)
+   Grid: 1360px
+   Font: Jost
+   ========================================================= */
+
+
+/* =========================================================
+   TOKENS (tylko fundament)
+   ========================================================= */
+
+:root {
+	/* Grid */
+	--container-max: 1360px;
+	--container-pad: 24px;
+
+	/* Section spacing */
+	--section-space: 60px;
+	--section-space-md: 60px;
+	--section-space-sm: 46px;
+
+	/* Colors */
+	--color-primary: #37205E;
+	--color-secondary: #EEB35C;
+	--color-third: #E2D6F6;
+	--color-white: #ffffff;
+
+
+	/* UI colors */
+	--color-cta-primary-text: #E2D6F6; /* tekst na fioletowym CTA */
+	--color-cta-white-bg: #E8E1F3;
+	--color-grey: #5E5C61;
+
+	/* Typography */
+	--font-family-base: "Jost", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+	/* Buttons */
+	--btn-height: 47px;
+	--btn-radius: 2px;
+
+	--btn-font-size: 16px;
+	--btn-font-weight: 600;
+	--btn-letter: -0.005em; /* ~ -0.5% */
+
+	--btn-pad-y: 12px;
+	--btn-pad-x: 20px;
+	--btn-gap: 15px;
+
+	/* LP NAV */
+	--lp-nav-height: 100px;
+	--lp-nav-top: 30px;
+	--lp-nav-radius: 2px;
+	--lp-nav-blur: 22px;
+
+	--lp-nav-link-size: 14px;
+	--lp-nav-link-line: 145%;
+	--lp-nav-link-weight: 600;
+
+	--lp-nav-cta-border: 2px;
+	--lp-nav-cta-color: #E8E1F3;
+
+	--lp-nav-gap: 28px;
+	--lp-nav-z: 999;
+
+	/* Focus */
+	--focus-ring: 0 0 0 3px rgba(238, 179, 92, 0.35);
+
+	/* Label (eyebrow) */
+	--section-label-size: 16px;
+	--section-label-line-h: 3px;
+	--section-label-line-w: 50px;
+	--section-label-line-radius: 1px;
+	--section-label-line-offset-y: 5px;
+	--section-label-gap: 12px;
+
+	/* H2 title */
+	--section-title-size: 48px;
+	--section-title-line: 55px;
+	--section-title-weight: 700;
+}
+
+
+/* co wystaję na mobile
+*{
+	outline: 1px solid rgba(255,0,0,0.15);
+}
+*/
+
+
+/* =========================================================
+   SECTION UI (globalny komponent: label + title)
+   ========================================================= */
+
+/* Label + kreska */
+.section-label {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: var(--section-label-gap);
+}
+
+.section-label__text {
+	margin: 0;
+	font-family: var(--font-family-base);
+	font-weight: 400;
+	font-size: var(--section-label-size);
+	line-height: 100%;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: var(--color-primary);
+}
+
+.section-label__line {
+	width: var(--section-label-line-w);
+	height: var(--section-label-line-h);
+	border-radius: var(--section-label-line-radius);
+	background: var(--color-primary);
+	position: relative;
+	top: var(--section-label-line-offset-y);
+}
+
+/* H2 (sekcyjny) */
+.section-title {
+	margin: 0;
+	font-family: var(--font-family-base);
+	font-weight: var(--section-title-weight);
+	font-size: var(--section-title-size);
+	line-height: var(--section-title-line);
+	letter-spacing: 0;
+	color: var(--color-primary);
+}
+
+/* Responsive dla tytułów sekcji */
+@media (max-width: 640px) {
+	:root {
+		--section-title-size: 34px;
+		--section-title-line: 40px;
+	}
+}
+
+/* =========================================================
+   USP / Location – description text
+   ========================================================= */
+
+.text-usp-desc{
+	font-family: var(--font-family-base);
+	font-weight: 700;
+	font-size: 20px;
+	line-height: 145%;
+	letter-spacing: 0;
+	color: var(--color-third);
+}
+
+
+/* =========================================================
+   BASE / RESET (globalny, bez typografii sekcji)
+   ========================================================= */
+
+html {
+	box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+body {
+	font-family: var(--font-family-base);
+	color: var(--color-primary);
+	margin: 0;
+}
+
+img,
+svg {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+
+/* =========================================================
+   GRID / CONTAINER
+   ========================================================= */
+
+.container {
+	max-width: var(--container-max);
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: var(--container-pad);
+	padding-right: var(--container-pad);
+}
+
+
+/* =========================================================
+   SECTIONS (tylko spacing + helpery)
+   ========================================================= */
+
+.section {
+	width: 100%;
+	padding-top: var(--section-space);
+	padding-bottom: var(--section-space);
+}
+
+.section--bleed {
+	width: 100%;
+}
+
+.section--no-top {
+	padding-top: 0;
+}
+
+.section--no-bottom {
+	padding-bottom: 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE TOKENS
+   ========================================================= */
+
+@media (max-width: 1024px) {
+	:root {
+		--container-pad: 20px;
+	}
+
+	.section {
+		padding-top: var(--section-space-md);
+		padding-bottom: var(--section-space-md);
+	}
+}
+
+@media (max-width: 640px) {
+	:root {
+		--container-pad: 16px;
+	}
+
+	.section {
+		padding-top: var(--section-space-sm);
+		padding-bottom: var(--section-space-sm);
+	}
+}
+
+/*/* =========================================================
+   BUTTONS / CTA (globalny komponent)
+   ========================================================= */
+
+.btn{
+	display: inline-flex;
+	align-items: center;
+	gap: var(--btn-gap);
+
+	padding: var(--btn-pad-y) var(--btn-pad-x);
+	min-height: var(--btn-height);
+	border-radius: var(--btn-radius);
+
+	font-family: var(--font-family-base);
+	font-weight: var(--btn-font-weight);
+	font-size: var(--btn-font-size);
+	line-height: 145%;
+	letter-spacing: var(--btn-letter);
+
+	text-decoration: none;
+	cursor: pointer;
+	user-select: none;
+
+	transition: transform 120ms ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.btn:focus-visible{
+	outline: none;
+	box-shadow: var(--focus-ring);
+}
+
+.btn:active{
+	transform: translateY(1px);
+}
+
+/* primary */
+.btn--primary{
+	background: var(--color-primary);
+	color: var(--color-cta-primary-text);
+	border: 2px solid transparent; /* żeby hover nie skakał */
+}
+
+/* hover jak hero */
+.btn--primary:hover{
+	background: var(--color-third);
+	border-color: var(--color-third);
+	color: var(--color-primary);
+}
+
+/* =========================================================
+   TEXT + ICON
+   ========================================================= */
+
+.btn__text{
+	display: inline-flex;
+	align-items: center;
+	white-space: nowrap;
+	color: inherit;
+}
+
+.btn__icon{
+	width: 10px;
+	height: 10px;
+	flex: 0 0 10px;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+
+.btn__icon--arrow{
+	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/btn_arrow.svg");
+}
+
+/* arrow w hover (na primary color) */
+.btn--primary:hover .btn__icon--arrow{
+	filter: brightness(0) saturate(100%) invert(18%) sepia(35%) saturate(1180%) hue-rotate(230deg);
+}
+
+/* =========================================================
+   FIGMA: 273x47 + padding + icon na końcu
+   ========================================================= */
+
+.btn--fixed{
+	min-height: 47px;
+
+	padding: 12px 29px 12px 25px;
+	justify-content: flex-start;
+}
+
+.btn--fixed .btn__icon{
+	margin-left: auto;
+}
+
+@media (max-width: 640px){
+	.btn--fixed{
+		width: 100%;
+		max-width: 320px;
+	}
+}
+
+
+
+
+/* =========================================================
+   LINKS (globalnie minimalnie)
+   ========================================================= */
+
+a {
+	color: inherit;
+}
+
+a.link-secondary {
+	color: var(--color-secondary);
+	text-decoration: none;
+}
+
+a.link-secondary:hover {
+	text-decoration: underline;
+}

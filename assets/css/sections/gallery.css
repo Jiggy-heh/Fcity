@@ -1,0 +1,388 @@
+/* =========================================================
+   GALLERY — gallery.css
+   ========================================================= */
+
+.gallery{
+	background: transparent;
+}
+
+/* =========================================================
+   HEAD (label/title + nav)
+   ========================================================= */
+
+.gallery__head{
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.gallery__head-left{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	flex: 1;
+}
+
+.gallery__head-left .section-label{
+	justify-content: center;
+	width: 100%;
+}
+
+.gallery__head-left .section-title{
+	margin-top: 25px;
+	text-align: center;
+}
+
+/* NAV — NIE ZMIENIAM POZYCJONOWANIA */
+.gallery__nav{
+	display: inline-flex;
+	gap: 14px;
+	align-items: center;
+	align-self: flex-end;
+	margin-bottom: -10px;
+}
+
+/* =========================================================
+   NAV BUTTONS — strzałki bez fontów (zostaje)
+   ========================================================= */
+
+.gallery__nav-btn{
+	width: 56px;
+	height: 56px;
+	border: 2px solid var(--color-primary);
+	border-radius: 2px;
+	background: transparent;
+	cursor: pointer;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	padding: 0;
+	line-height: 0;
+}
+
+.gallery__nav-btn span{
+	display: none;
+}
+
+.gallery__nav-btn::before{
+	content: "";
+	display: block;
+	width: 12px;
+	height: 12px;
+
+	border-top: 2px solid var(--color-primary);
+	border-right: 2px solid var(--color-primary);
+
+	transform-origin: 50% 50%;
+}
+
+.gallery__nav-btn--prev::before{ transform: rotate(-135deg); }
+.gallery__nav-btn--next::before{ transform: rotate(45deg); }
+
+.gallery__nav-btn:hover{
+	background: var(--color-third);
+}
+
+/* =========================================================
+   GRID (desktop/tablet)
+   ========================================================= */
+
+.gallery__grid{
+	--gal-gap: 18px;
+	--gal-row: 245px;
+
+	margin-top: 34px;
+
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--gal-gap);
+
+	grid-auto-flow: dense;
+	grid-auto-rows: var(--gal-row);
+}
+
+.gallery__item{
+	display: block;
+	border-radius: 2px;
+	overflow: hidden;
+	background: rgba(0,0,0,0.06);
+	height: 100%;
+}
+
+.gallery__item img{
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: cover;
+}
+
+.gallery__item:nth-child(5){
+	grid-column: 2;
+	grid-row: span 2;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1024px){
+	.gallery__grid{
+		grid-template-columns: repeat(2, 1fr);
+		--gal-row: 220px;
+		gap: 14px;
+		margin-top: 28px;
+	}
+
+	.gallery__item:nth-child(5){
+		grid-column: auto;
+		grid-row: auto;
+	}
+
+	.gallery__head{
+		align-items: center;
+	}
+
+	/* NAV — NIE ZMIENIAM POZYCJONOWANIA */
+	.gallery__nav{
+		margin-bottom: -8px;
+	}
+}
+
+@media (max-width: 640px){
+	.gallery__head{
+		align-items: center;
+	}
+
+	.gallery__head-left{
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	.gallery__head-left .section-label{
+		justify-content: flex-start;
+	}
+
+	/* zostawiam jak miałeś */
+	.gallery__head-left .section-label__line{
+		left: auto;
+		transform: none;
+	}
+
+	.gallery__head-left .section-title{
+		text-align: left;
+	}
+
+	/* NAV — NIE ZMIENIAM POZYCJONOWANIA */
+	.gallery__nav{
+		margin-bottom: -6px;
+	}
+
+	.gallery__nav-btn{
+		width: 48px;
+		height: 48px;
+	}
+
+	.gallery__grid{
+		margin-top: 18px;
+
+		display: flex;
+		gap: 14px;
+
+		overflow-x: auto;
+		overflow-y: hidden;
+		-webkit-overflow-scrolling: touch;
+
+		scroll-snap-type: x mandatory;
+		scroll-padding-left: 16px;
+
+		padding-bottom: 8px;
+	}
+
+	.gallery__item{
+		flex: 0 0 86%;
+		height: 220px;
+		scroll-snap-align: start;
+	}
+
+	.gallery__item:nth-child(5){
+		grid-column: auto;
+		grid-row: auto;
+	}
+}
+
+/* =========================================================
+   LIGHTBOX — FLX
+   ========================================================= */
+
+.flx-lightbox{
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	display: none;
+}
+
+.flx-lightbox.is-open{
+	display: block;
+}
+
+.flx-lightbox__backdrop{
+	position: absolute;
+	inset: 0;
+	background: rgba(0,0,0,0.65);
+}
+
+.flx-lightbox__panel{
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 28px;
+}
+
+.flx-lightbox__img{
+	max-width: min(1200px, 92vw);
+	max-height: 82vh;
+	border-radius: 2px;
+	display: block;
+}
+
+/* kolory: bg = --color-primary z opacity */
+.flx-lightbox__close,
+.flx-lightbox__arrow{
+	background: rgba(55,32,94,0.55);
+	background: color-mix(in srgb, var(--color-primary) 65%, transparent);
+	color: #fff;
+}
+
+:root{
+	--lb-half-w: min(600px, 46vw);
+}
+
+/* =========================================================
+   CLOSE (X) — NIE ZMIENIAM POZYCJI, tylko centrowanie znaku
+   ========================================================= */
+
+.flx-lightbox__close{
+	position: fixed;
+	top: calc(50% - (82vh / 2) - 12px);
+	left: calc(53% + var(--lb-half-w) - 52px);
+
+	width: 44px;
+	height: 44px;
+
+	border: 0;
+	border-radius: 10px;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	cursor: pointer;
+
+	/* klucz: wyłączamy fontowe "×" (baseline) */
+	font-size: 0;
+	line-height: 0;
+	color: transparent;
+
+	/* dla pseudo-elementów */
+	overflow: hidden;
+}
+
+/* rysujemy X idealnie w środku */
+.flx-lightbox__close::before,
+.flx-lightbox__close::after{
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 18px;
+	height: 2px;
+	background: #fff;
+	border-radius: 1px;
+	transform-origin: center;
+}
+
+.flx-lightbox__close::before{
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.flx-lightbox__close::after{
+	transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* =========================================================
+   ARROWS — POZYCJI NIE RUSZAM
+   ========================================================= */
+
+.flx-lightbox__arrow{
+	position: fixed;
+	top: 50%;
+	transform: translateY(-50%);
+
+	width: 48px;
+	height: 48px;
+
+	border: 0;
+	border-radius: 10px;
+
+	display: inline-flex;
+	align-items: flex-end;
+	justify-content: center;
+
+	cursor: pointer;
+	font-size: 28px;
+	line-height: 1;
+}
+
+.flx-lightbox__arrow--prev{
+	left: calc(50% - var(--lb-half-w) - 66px);
+}
+
+.flx-lightbox__arrow--next{
+	left: calc(50% + var(--lb-half-w) + 14px);
+}
+
+@media (max-width: 640px){
+	.flx-lightbox__panel{
+		padding: 16px;
+	}
+
+	.flx-lightbox__img{
+		max-width: 94vw;
+		max-height: 76vh;
+	}
+
+	:root{
+		--lb-half-w: 47vw;
+	}
+
+	/* NIE ZMIENIAM Twoich wartości (nawet jeśli są "dziwne") */
+	.flx-lightbox__close{
+		top: calc(66% - (76vh / 2) - 10px);
+		left: calc(50% + var(--lb-half-w) - 44px);
+	}
+
+	.flx-lightbox__arrow--prev{
+		left: calc(64% - var(--lb-half-w) - 56px);
+	}
+
+	.flx-lightbox__arrow--next{
+		left: calc(31% + var(--lb-half-w) + 21px);
+	}
+}
+
+/* NAV tylko na mobile */
+.gallery__nav{
+	display: none;
+}
+
+@media (max-width: 640px){
+	.gallery__nav{
+		display: inline-flex;
+	}
+}
