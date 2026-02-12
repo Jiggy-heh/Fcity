@@ -23,7 +23,6 @@ if ( empty( $section_label ) && empty( $section_title ) && empty( $items ) ) {
 	return;
 }
 
-$section_id = 'faq';
 ?>
 
 <div class="faq" id="<?php echo esc_attr( $section_id ); ?>">
