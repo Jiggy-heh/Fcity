@@ -209,7 +209,11 @@
 
 	.faq__more{
 		display: inline-flex;
-		margin-top: 16px;
+		position: relative;
+		z-index: 2;
+		margin-top: -12px;
+		align-items: center;
+		justify-content: center;
 		padding: 10px 14px;
 		border: 2px solid var(--color-primary);
 		background: transparent;

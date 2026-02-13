@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $section_label = get_field( 'faq_label' );
 $section_title = get_field( 'faq_title' );
 $items         = get_field( 'faq' );
+$list_id       = ! empty( $section_id ) ? $section_id . '-faq-list' : 'faq-list';
 
 if ( empty( $section_label ) && empty( $section_title ) && empty( $items ) ) {
 	return;
@@ -46,7 +47,7 @@ if ( empty( $section_label ) && empty( $section_title ) && empty( $items ) ) {
 		</div>
 
 		<?php if ( ! empty( $items ) && is_array( $items ) ) : ?>
-			<div class="faq__list" data-faq>
+			<div class="faq__list" id="<?php echo esc_attr( $list_id ); ?>" data-faq>
 				<?php foreach ( $items as $index => $item ) : ?>
 					<?php
 					$question = isset( $item['faq_question'] ) ? $item['faq_question'] : '';
@@ -84,7 +85,7 @@ if ( empty( $section_label ) && empty( $section_title ) && empty( $items ) ) {
 					</div>
 				<?php endforeach; ?>
 			</div>
-			<button class="faq__more" type="button" aria-expanded="false">Zobacz więcej</button>
+			<button class="faq__more" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr( $list_id ); ?>">Zobacz więcej</button>
 		<?php endif; ?>
 
 	</div>
