@@ -84,6 +84,7 @@ if ( empty( $section_label ) && empty( $section_title ) && empty( $items ) ) {
 					</div>
 				<?php endforeach; ?>
 			</div>
+			<button class="faq__more" type="button" aria-expanded="false">Zobacz więcej</button>
 		<?php endif; ?>
 
 	</div>

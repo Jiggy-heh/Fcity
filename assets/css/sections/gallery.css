@@ -150,7 +150,8 @@
 
 @media (max-width: 640px){
 	.gallery__head{
-		align-items: center;
+		align-items: flex-start;
+		flex-direction: column;
 	}
 
 	.gallery__head-left{
@@ -174,7 +175,8 @@
 
 	/* NAV — NIE ZMIENIAM POZYCJONOWANIA */
 	.gallery__nav{
-		margin-bottom: -6px;
+		margin-bottom: 0;
+		align-self: flex-start;
 	}
 
 	.gallery__nav-btn{

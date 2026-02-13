@@ -202,4 +202,27 @@
 	.faq__qtext{
 		white-space: normal;
 	}
+
+	.faq__list:not(.is-expanded) .faq__item:nth-child(n+5){
+		display: none;
+	}
+
+	.faq__more{
+		display: inline-flex;
+		margin-top: 16px;
+		padding: 10px 14px;
+		border: 2px solid var(--color-primary);
+		background: transparent;
+		color: var(--color-primary);
+		font-family: var(--font-family-base);
+		font-size: 16px;
+		font-weight: 600;
+		line-height: 145%;
+		cursor: pointer;
+	}
+}
+
+
+.faq__more{
+	display: none;
 }
