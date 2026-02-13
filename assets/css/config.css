@@ -175,6 +175,10 @@
 		--section-title-size: 34px;
 		--section-title-line: 40px;
 	}
+
+	.section-title {
+		font-size: 32px;
+	}
 }
 
 /* =========================================================
@@ -275,6 +279,7 @@ svg {
 	html {
 		--container-pad: 16px;
 		--section-title-size: 32px;
+		--section-title-line: 40px;
 		--section-space-sm: 35px;
 		--about-desc-size: 18px;
 		--hero-pad-top: 16px;

@@ -464,7 +464,6 @@
 	.hero__usp-icon img {
 		width: auto;
 		height: auto;
-		max-width: 100%;
 	}
 
 	@supports not (height: 100svh) {
@@ -485,7 +484,7 @@
 	}
 
 	.hero__left {
-		padding-top: var(--hero-pad-top);
+		padding-top: 8px;
 		max-width: 100%;
 	}
 
