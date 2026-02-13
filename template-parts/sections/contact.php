@@ -24,6 +24,8 @@ $office_title   = get_field( 'concat_office', $post_id );
 $office_address = get_field( 'concat_adress', $post_id );
 
 $form_shortcode = get_field( 'concat_shortcode_form', $post_id );
+$form_title     = get_field( 'hero_form_title', $post_id );
+$form_desc      = get_field( 'hero_form_desc', $post_id );
 
 /* Stałe CTA (tak jak chciałeś) */
 $email = 'oferty@flixhome.pl';
@@ -95,6 +97,16 @@ if ( ! $has_content ) {
 		<?php if ( ! empty( $form_shortcode ) ) : ?>
 			<div class="contact__form">
 				<div class="contact__form-box hero__form">
+					<?php if ( ! empty( $form_title ) ) : ?>
+						<h3 class="hero__form-title"><?php echo esc_html( $form_title ); ?></h3>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $form_desc ) ) : ?>
+						<div class="hero__form-desc">
+							<?php echo wp_kses_post( $form_desc ); ?>
+						</div>
+					<?php endif; ?>
+
 					<div class="hero__form-cf7">
 						<?php echo do_shortcode( wp_kses_post( $form_shortcode ) ); ?>
 					</div>
