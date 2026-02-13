@@ -146,4 +146,8 @@
 	.about .section-title {
 		margin-bottom: var(--section-space-sm);
 	}
+
+	.about__row.about__row--bottom {
+		margin-top: 40px;
+	}
 }

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	faqRoots.forEach(function (faqRoot) {
 		const moreButton = faqRoot.parentElement ? faqRoot.parentElement.querySelector('.faq__more') : null;
+		const faqItems = faqRoot.querySelectorAll('.faq__item');
 
 		faqRoot.addEventListener('click', function (event) {
 			const questionButton = event.target.closest('.faq__question');
@@ -16,12 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			questionButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 		});
 
-		if (moreButton) {
-			moreButton.addEventListener('click', function () {
-				const isExpanded = faqRoot.classList.toggle('is-expanded');
-				moreButton.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
-				moreButton.textContent = isExpanded ? 'Zobacz mniej' : 'Zobacz więcej';
-			});
+		if (!moreButton) return;
+
+		if (faqItems.length <= 4) {
+			moreButton.hidden = true;
+			return;
 		}
+
+		moreButton.addEventListener('click', function () {
+			const isExpanded = faqRoot.classList.toggle('is-expanded');
+			moreButton.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+			moreButton.textContent = isExpanded ? 'Zobacz mniej' : 'Zobacz więcej';
+		});
 	});
 });

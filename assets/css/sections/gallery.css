@@ -193,12 +193,18 @@
 		overflow-x: auto;
 		overflow-y: hidden;
 		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
 
 		scroll-snap-type: x mandatory;
 		scroll-padding-left: 16px;
 
 		padding-bottom: 8px;
 	}
+
+	.gallery__grid::-webkit-scrollbar{
+			display: none;
+		}
 
 	.gallery__item{
 		flex: 0 0 86%;

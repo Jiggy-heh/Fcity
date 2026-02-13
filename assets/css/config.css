@@ -274,12 +274,13 @@ svg {
 @media (max-width: 640px) {
 	html {
 		--container-pad: 16px;
+		--section-title-size: 32px;
 		--section-space-sm: 35px;
 		--about-desc-size: 18px;
-		--hero-pad-top: 32px;
+		--hero-pad-top: 16px;
 		--hero-pad-bottom: 32px;
 		--hero-gap-subtitle-desc: 18px;
-		--hero-gap-desc-highlight: 32px;
+		--hero-gap-desc-highlight: 45px;
 		--hero-gap-highlight-usp: 24px;
 		--hero-form-top: 0px;
 		--gallery-lightbox-half-w: 47vw;

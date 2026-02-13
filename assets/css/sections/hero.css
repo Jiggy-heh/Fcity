@@ -456,6 +456,17 @@
 		padding-bottom: var(--hero-pad-bottom);
 	}
 
+	.hero__usp-icon {
+		width: auto;
+		height: auto;
+	}
+
+	.hero__usp-icon img {
+		width: auto;
+		height: auto;
+		max-width: 100%;
+	}
+
 	@supports not (height: 100svh) {
 		.hero {
 			min-height: 100vh;
