@@ -141,3 +141,13 @@
 	}
 }
 
+
+@media (max-width: 640px) {
+	.about .section-title {
+		margin-bottom: var(--section-space-sm);
+	}
+
+	.about__row.about__row--bottom {
+		margin-top: 20px;
+	}
+}
