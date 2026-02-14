@@ -24,11 +24,27 @@ get_template_part( 'template-parts/components/lp-nav' );
 		<?php get_template_part( 'template-parts/sections/location' ); ?>
 	</section>
 
-	<?php /*
-	<section id="domy" class="section">
-	<?php get_template_part( 'template-parts/sections/houses' ); ?>
-	</section>
-	*/ ?>
+	<?php
+	$rendered_houses = false;
+	if ( function_exists( 'have_rows' ) && have_rows( 'fc_sections' ) ) :
+		while ( have_rows( 'fc_sections' ) ) : the_row();
+			$layout = get_row_layout();
+			$template = get_theme_file_path( "template-parts/sections/{$layout}.php" );
+
+			if ( file_exists( $template ) ) {
+				get_template_part( "template-parts/sections/{$layout}" );
+			}
+
+			if ( 'houses' === $layout ) {
+				$rendered_houses = true;
+			}
+		endwhile;
+	endif;
+
+	if ( ! $rendered_houses ) {
+		get_template_part( 'template-parts/sections/houses' );
+	}
+	?>
 
 	<section id="galeria" class="section">
 		<?php get_template_part( 'template-parts/sections/gallery' ); ?>
