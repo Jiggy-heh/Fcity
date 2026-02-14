@@ -25,10 +25,24 @@ get_template_part( 'template-parts/components/lp-nav' );
 	</section>
 
 	<?php
+	$finish_standard_section = null;
+	$fc_sections             = function_exists( 'get_field' ) ? get_field( 'fc_sections' ) : [];
+
+	if ( is_array( $fc_sections ) ) {
+		foreach ( $fc_sections as $fc_section ) {
+			if ( isset( $fc_section['acf_fc_layout'] ) && 'standard_wykonczenia' === $fc_section['acf_fc_layout'] ) {
+				$finish_standard_section = $fc_section;
+				break;
+			}
+		}
+	}
+
 	$rendered_houses = false;
 	if ( function_exists( 'have_rows' ) && have_rows( 'fc_sections' ) ) :
 		while ( have_rows( 'fc_sections' ) ) : the_row();
 			$layout = get_row_layout();
+
+
 			$template = get_theme_file_path( "template-parts/sections/{$layout}.php" );
 
 			if ( file_exists( $template ) ) {
@@ -45,6 +59,12 @@ get_template_part( 'template-parts/components/lp-nav' );
 		get_template_part( 'template-parts/sections/houses' );
 	}
 	?>
+
+	<?php if ( ! empty( $finish_standard_section ) ) : ?>
+		<section id="<?php echo esc_attr( ! empty( $finish_standard_section['section_id'] ) ? $finish_standard_section['section_id'] : 'standard-wykonczenia' ); ?>" class="section section--no-top finish-standard">
+			<?php get_template_part( 'template-parts/sections/finish-standard', null, [ 'data' => $finish_standard_section ] ); ?>
+		</section>
+	<?php endif; ?>
 
 	<section id="galeria" class="section">
 		<?php get_template_part( 'template-parts/sections/gallery' ); ?>
