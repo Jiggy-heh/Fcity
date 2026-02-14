@@ -244,6 +244,7 @@ function flixcity_enqueue_assets() {
 			'about',
 			'features',
 			'location',
+			'houses',
 			'gallery',
 			'faq',
 			'contact',
@@ -279,7 +280,7 @@ add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_assets' );
 
 //* Custom Post Type */
 require get_template_directory() . '/inc/post-types/inwestycje.php';
-
+require get_template_directory() . '/inc/acf/houses-layout.php';
 
 
 //* Scroll menu */
@@ -352,6 +353,17 @@ function flixcity_enqueue_section_scripts() {
 		wp_enqueue_script(
 			'flixcity-faq',
 			get_template_directory_uri() . '/assets/js/faq.js',
+			[],
+			'1.0.0',
+			true
+		);
+	}
+
+	/* Houses */
+	if ( file_exists( get_template_directory() . '/assets/js/houses.js' ) ) {
+		wp_enqueue_script(
+			'flixcity-houses',
+			get_template_directory_uri() . '/assets/js/houses.js',
 			[],
 			'1.0.0',
 			true

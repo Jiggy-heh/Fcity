@@ -346,6 +346,19 @@ svg {
 	color: var(--color-primary);
 }
 
+.btn--outline {
+	padding: 12px 20px;
+	gap: 15px;
+	border: 2px solid #37205E;
+	border-radius: 2px;
+	background: transparent;
+	color: #37205E;
+	font-family: var(--font-family-base);
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 145%;
+}
+
 /* =========================================================
    TEXT + ICON
    ========================================================= */
@@ -372,6 +385,16 @@ svg {
 
 .btn__icon--arrow{
 	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/btn_arrow.svg");
+}
+
+.btn__icon--hamburger {
+	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/hamburger_btn.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	width: 22px;
+	height: 20px;
+	flex: 0 0 22px;
 }
 
 /* arrow w hover (na primary color) */
