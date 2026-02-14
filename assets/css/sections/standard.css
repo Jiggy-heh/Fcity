@@ -1,0 +1,128 @@
+/* ==============================================
+   Section: Finish standard
+   ============================================== */
+.finish-standard {
+	text-align: center;
+}
+
+.finish-standard .container {
+	max-width: var(--houses-content-max);
+}
+
+.finish-standard__head .section-title {
+	margin-top: 25px;
+}
+
+.finish-standard__intro {
+	margin-top: 35px;
+}
+
+.finish-standard__intro,
+.finish-standard__text {
+	font-family: 'Jost', sans-serif;
+	font-weight: 400;
+	font-size: 20px;
+	line-height: 145%;
+	text-align: center;
+	color: var(--color-grey);
+}
+
+.finish-standard__checks {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px 24px;
+	margin-top: 40px;
+}
+
+.finish-standard__item {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	width: 100%;
+	padding: 10px 12px;
+	border: 3px solid transparent;
+	transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.finish-standard__icon {
+	flex: 0 0 24px;
+	width: 24px;
+	height: 24px;
+	background-image: url('https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/check.svg');
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+}
+
+.finish-standard__item-text {
+	font-family: 'Jost', sans-serif;
+	font-weight: 700;
+	font-size: 20px;
+	line-height: 140%;
+	color: var(--color-primary);
+	text-align: left;
+}
+
+.finish-standard__item:hover {
+	background-color: var(--color-primary);
+	border-color: var(--color-secondary);
+}
+
+.finish-standard__item:hover .finish-standard__item-text {
+	color: var(--color-secondary);
+}
+
+.finish-standard__item:hover .finish-standard__icon {
+	filter: brightness(0) invert(1);
+}
+
+.finish-standard__bottom {
+	margin-top: 60px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.finish-standard__bottom .btn {
+	margin-top: 20px;
+}
+
+.finish-standard__nav {
+	display: none;
+}
+
+@media (max-width: 991px) {
+	.finish-standard__checks {
+		display: flex;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		gap: 12px;
+		padding-bottom: 8px;
+	}
+
+	.finish-standard__checks::-webkit-scrollbar {
+		display: none;
+	}
+
+	.finish-standard__item {
+		flex: 0 0 100%;
+		scroll-snap-align: start;
+	}
+
+	.finish-standard__nav {
+		display: flex;
+		justify-content: center;
+		gap: 10px;
+		margin-top: 16px;
+	}
+
+	.finish-standard__nav-btn {
+		width: 42px;
+		height: 42px;
+		border: 1px solid var(--color-primary);
+		background: #fff;
+		color: var(--color-primary);
+		cursor: pointer;
+	}
+}
