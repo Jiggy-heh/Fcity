@@ -117,8 +117,18 @@
 	--gallery-grid-gap: 18px;
 	--gallery-grid-row-h: 245px;
 	--gallery-lightbox-half-w: min(600px, 46vw);
+
+	/* Expanded form */
+	--houses-content-max: 1228px;
+
 }
 
+/* MOBILE OVERRIDE */
+@media (max-width: 991px) {
+	:root {
+		--hero-gap-desc-highlight: 40px;
+	}
+}
 
 /* co wystaję na mobile
 *{

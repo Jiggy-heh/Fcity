@@ -32,7 +32,10 @@ $is_lp = is_singular( 'inwestycje' );
 
 </div><!-- #page -->
 
+
+
 <?php wp_footer(); ?>
+
 
 </body>
 </html>

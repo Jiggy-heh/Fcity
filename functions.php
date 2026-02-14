@@ -371,3 +371,4 @@ function flixcity_enqueue_section_scripts() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_section_scripts', 40 );
+

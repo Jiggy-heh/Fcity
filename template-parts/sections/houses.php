@@ -67,22 +67,88 @@ if ( empty( $desc ) ) {
 			</div>
 		</div>
 
+		<?php
+		$houses_dev = current_user_can( 'manage_options' ) && isset( $_GET['houses_dev'] ) && '1' === $_GET['houses_dev'];
+		?>
+
+		<?php if ( $houses_dev ) : ?>
+			<div class="houses__dev" data-houses-dev>
+				<div class="houses__dev-row">
+					<button type="button" class="houses__dev-toggle" data-houses-dev-toggle aria-pressed="false">
+						Tryb łapania koordynatów: OFF
+					</button>
+					<p class="houses__dev-tip">Tip: klikaj punkty na makiecie, potem skopiuj points. ENTER kończy polygon.</p>
+				</div>
+
+				<div class="houses__dev-row">
+					<label class="houses__dev-label">
+						Aktualny dom (data-house):
+						<input type="text" class="houses__dev-input" value="1" data-houses-dev-house>
+					</label>
+
+					<label class="houses__dev-label">
+						Aktywna mapa:
+						<select class="houses__dev-select" data-houses-dev-map>
+							<option value="auto">auto (widoczna)</option>
+							<option value="desktop">desktop</option>
+							<option value="mobile">mobile</option>
+						</select>
+					</label>
+				</div>
+
+				<div class="houses__dev-row">
+					<textarea class="houses__dev-output" rows="3" readonly data-houses-dev-output placeholder="Tu pojawi się string points..."></textarea>
+				</div>
+
+				<div class="houses__dev-row">
+					<button type="button" class="houses__dev-btn" data-houses-dev-copy>Kopiuj</button>
+					<button type="button" class="houses__dev-btn" data-houses-dev-clear>Wyczyść</button>
+				</div>
+			</div>
+		<?php endif; ?>
+
 		<div class="houses__stage" data-houses-stage>
 			<div class="houses__frame">
 				<?php if ( ! empty( $image_url ) ) : ?>
-					<img class="houses__img" src="<?php echo esc_url( $image_url ); ?>" alt="">
+					<picture>
+						<source media="(max-width: 991px)" srcset="https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/makieta_domow_mobile.jpg">
+						<img class="houses__img" src="<?php echo esc_url( $image_url ); ?>" alt="">
+					</picture>
 				<?php endif; ?>
+
 				<div class="houses__overlay" data-houses-overlay>
 					<p class="houses__overlay-text">Kliknij i wybierz dom który Cię interesuje</p>
 				</div>
-				<svg class="houses__map" viewBox="0 0 1235 542" preserveAspectRatio="none" aria-label="Mapa domów">
-					<polygon class="houses__shape" data-house="1" points="360,206 406,196 435,212 434,250 388,258 360,242" tabindex="0"></polygon>
-					<polygon class="houses__shape" data-house="2" points="422,198 468,188 498,204 497,242 451,250 422,234" tabindex="0"></polygon>
-					<polygon class="houses__shape" data-house="3" points="485,189 531,179 560,195 560,233 514,241 485,225" tabindex="0"></polygon>
-					<polygon class="houses__shape" data-house="4" points="548,180 594,170 623,186 623,224 577,232 548,216" tabindex="0"></polygon>
-					<polygon class="houses__shape" data-house="5" points="611,171 657,161 686,177 685,215 639,223 611,207" tabindex="0"></polygon>
-					<polygon class="houses__shape" data-house="6" points="674,162 720,152 749,168 748,206 702,214 674,198" tabindex="0"></polygon>
+
+				<svg class="houses__map houses__map--desktop" viewBox="0 0 1235 542" preserveAspectRatio="none" aria-label="Mapa domów (desktop)">
+					<rect class="houses__map-hit" x="0" y="0" width="1235" height="542" fill="transparent"></rect>
+
+					<polygon class="houses__shape" data-house="1" points="698,256 698,284 755,295 779,275 779,247 772,244 710,235" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="2" points="607,241 607,268 663,280 686,262 686,235 677,230 621,221" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="3" points="526,228 527,255 576,265 604,249 603,220 592,217 541,208" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="4" points="452,214 454,241 499,250 526,237 526,210 514,204 467,198" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="5" points="385,205 386,228 427,236 458,225 457,199 441,194 400,187" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="6" points="647,315 647,354 716,367 743,339 745,304 734,302 663,287" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="7" points="542,294 543,326 605,340 634,318 636,284 622,282 559,268" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="8" points="430,271 431,300 484,314 520,296 519,263 502,258 445,248" tabindex="0"></polygon>
 				</svg>
+
+
+				<svg class="houses__map houses__map--mobile" viewBox="0 0 1235 542" preserveAspectRatio="none" aria-label="Mapa domów (mobile)">
+					<rect class="houses__map-hit" x="0" y="0" width="1235" height="542" fill="transparent"></rect>
+
+					<polygon class="houses__shape" data-house="1" points="976,282 976,309 1137,322 1197,303 1201,275 1184,270 1010,260" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="2" points="760,245 721,264 726,294 874,304 946,288 951,260 917,255" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="3" points="535,234 501,252 497,279 637,288 709,273 713,246 675,240" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="4" points="331,222 284,240 293,267 416,275 497,263 501,236 458,228" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="5" points="140,213 98,230 106,257 216,263 306,252 301,224 263,219" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="6" points="874,312 836,340 832,376 1027,389 1108,364 1108,330 1082,324" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="7" points="586,295 539,318 543,351 717,362 802,342 806,312 760,307" tabindex="0"></polygon>
+					<polygon class="houses__shape" data-house="8" points="272,275 225,295 233,327 382,339 480,319 484,288" tabindex="0"></polygon>
+				</svg>
+
+
+
 				<div class="houses__tooltip" data-houses-tooltip hidden>
 					<p class="houses__tooltip-title"></p>
 					<p class="houses__tooltip-status"></p>
@@ -97,7 +163,7 @@ if ( empty( $desc ) ) {
 					<div class="houses__stats">
 						<div class="houses__stat"><span class="houses__stat-label">Cena:</span> <span class="houses__stat-value" data-house-price>—</span></div>
 						<div class="houses__stat"><span class="houses__stat-label">Powierzchnia:</span> <span class="houses__stat-value" data-house-area>—</span></div>
-						<div class="houses__stat"><span class="houses__stat-label">Ogród / działka:</span> <span class="houses__stat-value" data-house-plot>—</span></div>
+						<div class="houses__stat"><span class="houses__stat-label">Działka:</span> <span class="houses__stat-value" data-house-plot>—</span></div>
 					</div>
 					<div class="houses__actions">
 						<a class="btn btn--outline" href="#" data-house-plan>
@@ -120,26 +186,13 @@ if ( empty( $desc ) ) {
 			<div class="houses__form">
 				<div class="houses__form-grid">
 					<div class="houses__form-copy">
-						<h3 class="section-title houses__form-title">Nie czekaj i zapytaj o ten dom</h3>
+						<h3 class="section-title houses__form-title">Nie czekaj i zapytaj o&nbsp;ten dom</h3>
 						<p class="houses__form-desc">Wypełnij formularz a my skontaktujemy się z Tobą.</p>
 					</div>
 					<div class="fc-form fc-form--houses">
-						<form>
-							<div class="fc-form__fields">
-								<input class="fc-input" type="text" name="phone" placeholder="Twój numer telefonu">
-								<input class="fc-input" type="text" name="fullname" placeholder="Twoje imię">
-								<input class="fc-input" type="email" name="email" placeholder="Twój adres email">
-								<input class="fc-input" type="text" name="city" placeholder="Twoje miasto">
-							</div>
-							<div class="fc-form__consents">
-								<label><input class="fc-consent" type="checkbox"> <span>Zgoda na kontakt telefoniczny i emailowy.</span></label>
-								<label><input class="fc-consent" type="checkbox"> <span>Akceptuję politykę prywatności.</span></label>
-							</div>
-							<div class="fc-form__actions">
-								<button class="fc-submit" type="submit">Wyślij wiadomość</button>
-							</div>
-						</form>
+						<?php echo do_shortcode( '[contact-form-7 id="f30e671" title="Formularz Domy"]' ); ?>
 					</div>
+
 				</div>
 			</div>
 		</div>

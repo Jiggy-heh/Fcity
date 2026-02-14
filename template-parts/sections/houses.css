@@ -147,7 +147,7 @@
 }
 
 /* =========================================================
-   EXPANDED PANEL (full width tła + content 1228px)
+   EXPANDED PANEL (dane lokalu + obrazek)
    ========================================================= */
 
 .houses__expanded {
@@ -161,20 +161,15 @@
 }
 
 .houses__expanded.is-visible {
-	max-height: 2200px;
+	max-height: 2000px;
 	opacity: 1;
 }
 
-/* trzymamy marginesy jak obrazek: content = 1228px */
 .houses__expanded-grid {
-	width: 100%;
-	max-width: var(--houses-content-max, 1228px);
-	margin: 0 auto;
-	padding: 40px 35px 60px;
-
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 24px;
+	padding: 40px 55px 60px;
 }
 
 .houses__expanded-title {
@@ -218,7 +213,7 @@
 @media (max-width: 991px) {
 	.houses__expanded-grid {
 		grid-template-columns: 1fr;
-		padding: 32px var(--container-pad) 28px;
+		padding: 32px 22px 28px;
 	}
 
 	.houses__actions {
@@ -227,13 +222,14 @@
 }
 
 /* =========================================================
-   FORM WRAPPER (full width tła + content 1228px)
+   FORM WRAPPER (żółte tło + pasek na dole)
    ========================================================= */
 
 .houses__form {
 	position: relative;
 	width: 100%;
 	background: var(--color-secondary);
+	padding: 40px 55px;
 	border-radius: 0 0 8px 8px;
 }
 
@@ -249,11 +245,6 @@
 }
 
 .houses__form-grid {
-	width: 100%;
-	max-width: var(--houses-content-max, 1228px);
-	margin: 0 auto;
-	padding: 40px 0 40px;
-
 	display: grid;
 	grid-template-columns: 1fr 1.45fr;
 	gap: 30px;
@@ -275,202 +266,164 @@
 }
 
 @media (max-width: 991px) {
+	.houses__form {
+		padding: 24px 22px;
+	}
+
 	.houses__form-grid {
 		grid-template-columns: 1fr;
 		gap: 18px;
 		align-items: start;
-		padding: 24px var(--container-pad) 24px;
 	}
 }
 
 /* =========================================================
-   CF7 – HOUSES (czysto, bez !important)
-   Cel: 4 inputy w 2 kolumnach + pod nimi: zgody (lewo) i button (prawo)
+   CF7 – reset / żeby nic nie “uciekało”
    ========================================================= */
 
-.fc-form.fc-form--houses,
-.fc-form.fc-form--houses * {
+.fc-form--houses,
+.fc-form--houses * {
 	box-sizing: border-box;
 }
 
-.fc-form.fc-form--houses .wpcf7,
-.fc-form.fc-form--houses .wpcf7 form {
+.fc-form--houses .wpcf7 {
 	margin: 0;
-	width: 100%;
 }
 
-.fc-form.fc-form--houses p { margin: 0; }
-.fc-form.fc-form--houses br { display: none; }
-.fc-form.fc-form--houses .wpcf7-spinner { display: none; }
-
-/* CF7: 1 <p> + <br> → spłaszczamy tylko wewnątrz sekcji */
-.fc-form.fc-form--houses .fc-form__fields > p,
-.fc-form.fc-form--houses .fc-form__consents > p,
-.fc-form.fc-form--houses .fc-form__actions > p {
-	display: contents;
+.fc-form--houses form {
+	margin: 0;
 }
 
-/* ===== GRID na wrapperze ===== */
-
-.fc-form.fc-form--houses .wpcf7 form {
-	display: block;
+.fc-form--houses p {
+	margin: 0;
 }
 
-.fc-form.fc-form--houses .fc-form__grid {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
-	grid-template-areas:
-		"fields   fields"
-		"consents actions";
-	column-gap: 28px;
-	row-gap: 14px;
-	align-items: start;
-	width: 100%;
-	min-width: 0;
+.fc-form--houses br {
+	display: none;
 }
 
-.fc-form.fc-form--houses .fc-form__fields   { grid-area: fields;   min-width: 0; }
-.fc-form.fc-form--houses .fc-form__consents { grid-area: consents; min-width: 0; }
-.fc-form.fc-form--houses .fc-form__actions  { grid-area: actions;  min-width: 0; }
-
-/* ===== Fields: 2 kolumny ===== */
-
-.fc-form.fc-form--houses .fc-form__fields {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 14px 22px;
-	width: 100%;
-	min-width: 0;
+/* ważne: CF7 lubi owijać submit i acceptance w <p> */
+.fc-form--houses form > p {
+	margin: 0;
 }
 
-.fc-form.fc-form--houses .fc-field,
-.fc-form.fc-form--houses .wpcf7-form-control-wrap {
+/* =========================================================
+   CF7 – grid wewnątrz formularza
+   ========================================================= */
+
+.fc-form--houses .fc-form__grid {
 	display: block;
 	width: 100%;
-	min-width: 0;
 }
 
-/* ===== Inputy: jak Figma, 100% kolumny ===== */
+.fc-form--houses .fc-form__fields {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px 20px;
+	margin-bottom: 12px;
+}
 
-.fc-form.fc-form--houses .fc-input,
-.fc-form.fc-form--houses input[type="text"],
-.fc-form.fc-form--houses input[type="email"],
-.fc-form.fc-form--houses input[type="tel"] {
+.fc-form--houses .fc-field {
+	display: block;
 	width: 100%;
-	height: 42px;
-	padding: 12px 16px;
+}
 
-	background: rgba(255, 255, 255, 0.2);
-	border: 1px solid #FFFFFF;
-	border-radius: 1px;
+@media (max-width: 991px) {
+	.fc-form--houses .fc-form__fields {
+		grid-template-columns: 1fr;
+	}
+}
 
-	font-family: "Open Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-	font-weight: 400;
+/* inputy */
+.fc-form--houses .fc-input,
+.fc-form--houses input[type="text"],
+.fc-form--houses input[type="email"],
+.fc-form--houses input[type="tel"] {
+	width: 100%;
+	height: 44px;
+	padding: 10px 12px;
+	border: 1px solid rgba(55, 32, 94, 0.3);
+	background: rgba(255, 255, 255, 0.35);
+	color: var(--color-primary);
+	border-radius: 2px;
+	font-family: Jost, sans-serif;
 	font-size: 14px;
-	line-height: 125%;
-	color: var(--color-primary);
-
-	min-width: 0;
+	line-height: 1.2;
 }
 
-.fc-form.fc-form--houses input::placeholder {
-	color: var(--color-primary);
-	opacity: 1;
+/* placeholder */
+.fc-form--houses input::placeholder {
+	color: rgba(55, 32, 94, 0.65);
 }
 
-/* ===== Consents ===== */
+/* =========================================================
+   CF7 – zgody
+   ========================================================= */
 
-.fc-form.fc-form--houses .fc-form__consents {
+.fc-form--houses .fc-form__consents {
 	display: flex;
 	flex-direction: column;
-	padding-top: 2px;
-	margin: 0;
-	width: 100%;
-	min-width: 0;
+	gap: 6px;
+	margin-bottom: 16px;
 }
 
-.fc-form.fc-form--houses .wpcf7-acceptance .wpcf7-list-item {
+.fc-form--houses .fc-consent-item {
+	display: block;
+}
+
+.fc-form--houses .wpcf7-acceptance .wpcf7-list-item {
 	margin: 0;
 }
 
-.fc-form.fc-form--houses .wpcf7-acceptance label {
+.fc-form--houses .wpcf7-acceptance label {
 	display: flex;
 	gap: 8px;
 	align-items: flex-start;
-
-	font-size: 8px;
-	line-height: 9px;
+	font-size: 11px;
+	line-height: 1.35;
 	color: var(--color-primary);
-	font-weight: 500;
 }
 
-/* ===== Actions (button w prawej kolumnie) ===== */
+.fc-form--houses .wpcf7-acceptance input[type="checkbox"] {
+	margin-top: 2px;
+	flex: 0 0 auto;
+}
 
-.fc-form.fc-form--houses .fc-form__actions {
+/* =========================================================
+   CF7 – akcje / button (zawsze w gridzie, nie poza)
+   ========================================================= */
+
+.fc-form--houses .fc-form__actions {
 	display: flex;
 	justify-content: flex-end;
-	align-items: center;
-	width: 100%;
-	min-width: 0;
 }
 
-.fc-form.fc-form--houses .wpcf7-form-control.wpcf7-submit {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-
-	height: 45px;
-	padding: 12px 20px;
-	width: 189px;
-	margin-left: auto;
-
-	background: var(--color-primary);
-	color: var(--color-cta-primary-text);
+.fc-form--houses .fc-submit,
+.fc-form--houses input[type="submit"] {
+	height: 48px;
+	padding: 0 26px;
 	border: 0;
+	background: var(--color-primary);
+	color: #fff;
+	font-family: Jost, sans-serif;
+	font-weight: 700;
+	font-size: 14px;
+	line-height: 1;
+	cursor: pointer;
 	border-radius: 2px;
-
-	font-family: "Jost", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-	font-weight: 600;
-	font-size: 16px;
-	line-height: 145%;
-	letter-spacing: -0.005em;
-
 	white-space: nowrap;
-	min-width: 0;
-	max-width: 100%;
 }
 
-/* Komunikaty CF7 */
-.fc-form.fc-form--houses .wpcf7-response-output,
-.fc-form.fc-form--houses .wpcf7-not-valid-tip {
-	grid-column: 1 / -1;
-}
-
-/* Mobile */
 @media (max-width: 991px) {
-	.fc-form.fc-form--houses .fc-form__grid {
-		grid-template-columns: 1fr;
-		grid-template-areas:
-			"fields"
-			"consents"
-			"actions";
-	}
-
-	.fc-form.fc-form--houses .fc-form__fields {
-		grid-template-columns: 1fr;
-	}
-
-	.fc-form.fc-form--houses .fc-form__actions {
+	.fc-form--houses .fc-form__actions {
 		justify-content: flex-start;
 	}
 
-	.fc-form.fc-form--houses .wpcf7-form-control.wpcf7-submit {
+	.fc-form--houses .fc-submit,
+	.fc-form--houses input[type="submit"] {
 		width: 100%;
-		margin-left: 0;
 	}
 }
-
-
 
 /* =========================================================
    DEV: Polygon drawer
@@ -548,19 +501,4 @@
 	fill: rgba(0, 0, 0, 0.18);
 	stroke: rgba(255, 255, 255, 0.75);
 	stroke-width: 2;
-}
-
-
-@media (max-width: 991px) {
-	.houses__expanded-title {
-		font-size: 36px;
-	}
-
-	.houses__stat-label {
-		font-size: 26px;
-	}
-
-	.houses__stat-value {
-		font-size: 26px;
-	}
 }
