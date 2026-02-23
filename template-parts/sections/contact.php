@@ -28,8 +28,8 @@ $form_title     = get_field( 'hero_form_title', $post_id );
 $form_desc      = get_field( 'hero_form_desc', $post_id );
 
 /* Stałe CTA (tak jak chciałeś) */
-$email = 'oferty@flixhome.pl';
-$phone = '+48 883 990 877';
+$email = 'oferty@flixcity.pl';
+$phone = '+48 883 990 084';
 
 $bg_url = '';
 if ( is_array( $bg_image ) && ! empty( $bg_image['url'] ) ) {
@@ -53,7 +53,8 @@ if ( ! $has_content ) {
 }
 ?>
 
-<section class="section section--no-top contact" id="<?php echo esc_attr( $section_id ); ?>">
+<div class="contact" id="<?php echo esc_attr( $section_id ); ?>">
+
 
 	<?php if ( $bg_url ) : ?>
 		<div class="contact__bg" aria-hidden="true">
@@ -115,4 +116,4 @@ if ( ! $has_content ) {
 		<?php endif; ?>
 
 	</div>
-</section>
+</div>

@@ -74,6 +74,7 @@ if ( empty( $scroll_label ) ) {
 }
 ?>
 
+
 <div class="hero">
 
 	<?php if ( $bg_url ) : ?>
@@ -82,7 +83,10 @@ if ( empty( $scroll_label ) ) {
 		<div class="hero__bg" aria-hidden="true"></div>
 	<?php endif; ?>
 
+	<img class="hero__shape" src="https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/shape_hero.svg" alt="" aria-hidden="true">
+
 	<div class="hero__content">
+
 		<div class="hero__grid">
 
 			<!-- LEFT -->
@@ -160,7 +164,7 @@ if ( empty( $scroll_label ) ) {
 			</div>
 
 			<!-- RIGHT (FORM BOX) -->
-			<div class="hero__right" id="kontakt">
+			<div class="hero__right">
 				<div class="hero__form">
 
 					<?php if ( $form_title ) : ?>

@@ -31,13 +31,68 @@
 /* Content container */
 .hero__content {
 	position: relative;
-	z-index: 1;
+	z-index: 2;
 	max-width: var(--container-max);
 	margin: 0 auto;
 	padding-left: var(--container-pad);
 	padding-right: var(--container-pad);
 	padding-top: 0; /* <-- KLUCZ: nie pchamy prawej kolumny */
 }
+
+.hero__bg::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.38); /* #00000061 */
+	pointer-events: none;
+}
+
+.hero__shape {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -2px;
+	width: 100%;
+	height: 57px;       
+	display: block;
+	object-fit: cover;    
+	object-position: center bottom;
+
+	z-index: 1;
+	pointer-events: none;
+	user-select: none;
+}
+
+@media (max-width: 640px){
+
+	.hero{
+		overflow: hidden;
+	}
+
+	.hero__shape{
+		position: absolute;
+		left: 50%;
+		bottom: -2px;
+
+		width: calc(100vw + 24px); /* bleed */
+		max-width: none;           /* KLUCZ: pozwala urosnąć ponad 100% */
+		min-width: calc(100vw + 24px);
+
+		height: 40px;
+		transform: translateX(-50%) scaleY(1.02);
+
+		display: block;
+		object-fit: cover;
+		object-position: center bottom;
+
+		z-index: 1;
+		pointer-events: none;
+	}
+
+}
+
+
+
 
 /* Grid */
 .hero__grid {
@@ -210,6 +265,7 @@
 .hero__more {
 	position: absolute;
 	left: 50%;
+	z-index: 3;
 
 	/* liczymy realny dół formularza względem góry .hero */
 	top: calc(
@@ -465,6 +521,7 @@
 	.hero__bg {
 		position: absolute;
 		inset: 0;
+		z-index: 0; 
 	}
 
 	.hero__grid {
@@ -554,3 +611,4 @@
 	display: none;
 	content: none;
 }
+

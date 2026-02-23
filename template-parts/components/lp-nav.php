@@ -22,7 +22,7 @@ $arrow_url = 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/bt
 			<ul class="lp-nav__links" role="list">
 				<li><a href="#o-inwestycji">Inwestycja</a></li>
 				<li><a href="#lokalizacja">Lokalizacja</a></li>
-				<li><a href="#domy">Domy</a></li>
+				<li><a href="#wybierz-dom">Domy</a></li>
 				<li><a href="#galeria">Galeria</a></li>
 				<li><a href="#kontakt">Kontakt</a></li>
 			</ul>

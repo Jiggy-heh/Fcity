@@ -249,6 +249,8 @@ function flixcity_enqueue_assets() {
 			'gallery',
 			'faq',
 			'contact',
+			'footer-bar',
+
 		];
 
 		foreach ( $sections as $section ) {

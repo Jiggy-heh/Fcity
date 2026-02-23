@@ -1,0 +1,129 @@
+/* =========================================================
+   FOOTER BAR
+   ========================================================= */
+
+.footer-bar{
+	background: var(--color-primary);
+	padding-top: 48px;
+	padding-bottom: 34px;
+}
+
+.footer-bar__inner{
+	max-width: var(--container-max);
+	margin: 0 auto;
+	padding-left: var(--container-pad);
+	padding-right: var(--container-pad);
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.footer-bar__left{
+	display: inline-flex;
+	align-items: center;
+	gap: 24px; /* label -> ikony */
+	flex: 0 1 auto;
+}
+
+/* copy + linki: ten sam styl */
+.footer-bar__label,
+.footer-bar__link{
+	font-family: var(--font-family-base);
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 100%;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: var(--color-third);
+}
+
+/* =========================================================
+   SOCIAL
+   ========================================================= */
+
+.footer-bar__social{
+	display: inline-flex;
+	align-items: center;
+	gap: 24px;          /* gap między ikonami */
+	flex-wrap: nowrap;  /* 4 w rzędzie */
+}
+
+.footer-bar__social-link{
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	text-decoration: none;
+}
+
+.footer-bar__icon{
+	width: 24px;
+	height: 24px;
+	display: block;
+}
+
+/* hover dla ikon: robimy recolor przez filter (działa na SVG img) */
+.footer-bar__social-link:hover .footer-bar__icon{
+	filter: brightness(0) saturate(100%) invert(73%) sepia(30%) saturate(932%) hue-rotate(341deg) brightness(101%) contrast(92%);
+}
+
+/* =========================================================
+   LINKS (prawa strona)
+   ========================================================= */
+
+.footer-bar__links{
+	display: inline-flex;
+	align-items: center;
+	gap: 40px;
+	flex: 0 0 auto;
+	margin-left: auto;
+}
+
+.footer-bar__link{
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.footer-bar__link:hover{
+	color: var(--color-secondary);
+	text-decoration: none;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px){
+
+	.footer-bar__inner{
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 24px;
+	}
+
+	.footer-bar__left{
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 16px;
+		width: 100%;
+	}
+
+	/* 4 ikony w rzędzie */
+	.footer-bar__social{
+		display: flex;
+		gap: 24px;
+		flex-wrap: nowrap;
+	}
+
+	/* linki pojedynczo */
+	.footer-bar__links{
+		margin-left: 0;
+		width: 100%;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+}

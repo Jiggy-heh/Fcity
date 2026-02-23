@@ -44,12 +44,36 @@
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
+
+	position: relative;
+	overflow: hidden;
+
+	/* ustawiane z JS (collapsed) */
+	max-height: var(--faq-collapsed-h, none);
+}
+
+.faq__list.is-expanded{
+	max-height: none;
+}
+
+.faq__list:not(.is-expanded)::after{
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 64px;
+	pointer-events: none;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
 }
 
 .faq__item{
 	background: rgba(232, 225, 243, 0.23); /* #E8E1F34A / 23% */
 	border-radius: 2px;
 	overflow: hidden;
+
+	/* KLUCZ: nie pozwól flexowi “ściskać” itemów przy max-height */
+	flex-shrink: 0;
 }
 
 /* =========================================================
@@ -121,7 +145,6 @@
 
 /* =========================================================
    ANSWER (WYSIWYG)
-   - “10px wewnętrzny padding” robimy tutaj, bez ruszania question
    ========================================================= */
 
 .faq__answer{
@@ -153,6 +176,20 @@
 .faq__acontent ul,
 .faq__acontent ol{
 	margin: 0 0 12px 20px;
+}
+
+/* =========================================================
+   MORE BUTTON — globalny btn + inny arrow
+   ========================================================= */
+
+.faq__more{
+	width: 100%;
+	max-width: none;
+	margin-top: 20px;
+}
+
+.faq__more .btn__icon--arrow{
+	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/faq_btn.svg");
 }
 
 /* =========================================================
@@ -191,18 +228,6 @@
 	.faq__list{
 		margin-top: 18px;
 		gap: 14px;
-		position: relative;
-	}
-
-	.faq__list:not(.is-expanded)::after{
-		content: "";
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		height: 64px;
-		pointer-events: none;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
 	}
 
 	.faq__num,
@@ -214,31 +239,4 @@
 	.faq__qtext{
 		white-space: normal;
 	}
-
-	.faq__list:not(.is-expanded) .faq__item:nth-child(n+5){
-		display: none;
-	}
-
-	.faq__more{
-		display: inline-flex;
-		position: relative;
-		z-index: 2;
-		margin-top: -12px;
-		align-items: center;
-		justify-content: center;
-		padding: 10px 14px;
-		border: 2px solid var(--color-primary);
-		background: transparent;
-		color: var(--color-primary);
-		font-family: var(--font-family-base);
-		font-size: 16px;
-		font-weight: 600;
-		line-height: 145%;
-		cursor: pointer;
-	}
-}
-
-
-.faq__more{
-	display: none;
 }

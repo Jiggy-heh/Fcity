@@ -31,6 +31,10 @@ $title      = $get_acf( 'house_title' );
 $desc       = $get_acf( 'house_desc' );
 $image      = $get_acf( 'house_img' );
 
+$materials_label = $get_acf( 'house_materials_label' );
+$materials_title = $get_acf( 'house_materials_title' );
+$materials       = $get_acf( 'house_materials' );
+
 if ( empty( $section_id ) ) {
 	$section_id = 'wybierz-dom';
 }
@@ -52,6 +56,14 @@ if ( empty( $title ) ) {
 
 if ( empty( $desc ) ) {
 	$desc = 'Kliknij i wybierz dom który Cię interesuje';
+}
+
+if ( empty( $materials_label ) ) {
+	$materials_label = 'Inwestycje';
+}
+
+if ( empty( $materials_title ) ) {
+	$materials_title = 'Pobierz materiały';
 }
 ?>
 <section class="section houses is-step-1" id="<?php echo esc_attr( $section_id ); ?>">
@@ -133,7 +145,6 @@ if ( empty( $desc ) ) {
 					<polygon class="houses__shape" data-house="8" points="430,271 431,300 484,314 520,296 519,263 502,258 445,248" tabindex="0"></polygon>
 				</svg>
 
-
 				<svg class="houses__map houses__map--mobile" viewBox="0 0 1235 542" preserveAspectRatio="none" aria-label="Mapa domów (mobile)">
 					<rect class="houses__map-hit" x="0" y="0" width="1235" height="542" fill="transparent"></rect>
 
@@ -146,8 +157,6 @@ if ( empty( $desc ) ) {
 					<polygon class="houses__shape" data-house="7" points="586,295 539,318 543,351 717,362 802,342 806,312 760,307" tabindex="0"></polygon>
 					<polygon class="houses__shape" data-house="8" points="272,275 225,295 233,327 382,339 480,319 484,288" tabindex="0"></polygon>
 				</svg>
-
-
 
 				<div class="houses__tooltip" data-houses-tooltip hidden>
 					<p class="houses__tooltip-title"></p>
@@ -196,5 +205,38 @@ if ( empty( $desc ) ) {
 				</div>
 			</div>
 		</div>
+		<?php if ( ! empty( $materials ) && is_array( $materials ) ) : ?>
+			<div class="houses__materials">
+				<div class="houses__materials-grid">
+					<div class="houses__materials-left">
+						<div class="section-label">
+							<p class="section-label__text"><?php echo esc_html( $materials_label ); ?></p>
+							<span class="section-label__line" aria-hidden="true"></span>
+						</div>
+						<h2 class="section-title"><?php echo esc_html( $materials_title ); ?></h2>
+					</div>
+
+					<div class="houses__materials-buttons">
+						<?php foreach ( $materials as $row ) : ?>
+							<?php
+							$link = $row['material_link'] ?? null;
+
+							if ( empty( $link ) || empty( $link['url'] ) ) {
+								continue;
+							}
+
+							$url    = $link['url'];
+							$text   = ! empty( $link['title'] ) ? $link['title'] : 'Pobierz materiał';
+							$target = ! empty( $link['target'] ) ? $link['target'] : '_self';
+							?>
+							<a class="btn btn--outline houses__dev-btn" href="<?php echo esc_url( $url ); ?>" target="<?php echo esc_attr( $target ); ?>" rel="noopener">
+								<span class="btn__text"><?php echo esc_html( $text ); ?></span>
+								<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+		<?php endif; ?>		
 	</div>
 </section>

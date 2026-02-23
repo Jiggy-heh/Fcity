@@ -13,18 +13,76 @@
 	text-shadow: var(--hero-text-shadow);
 }
 
-.location{
-	
-}
-
 .section.location{
-	height: 985px;
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+
+	min-height: 985px;
+	height: auto;
+
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: 50% 100%;
+
+	--location-shape-h: 57px; /* desktop */
 }
 
+/* overlay nad zdjęciem (PRZYKRYWA CAŁĄ sekcję) */
+.location__overlay{
+	position: absolute;
+	inset: 0;
 
+	z-index: 1;
+	background: rgba(55, 32, 94, 0.30);
+	pointer-events: none;
+}
+
+/* shape NA GÓRZE */
+.location__shape{
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: -2px;
+
+	width: 100%;
+	height: auto; /* zostaje auto */
+
+	display: block;
+
+	z-index: 2;
+	pointer-events: none;
+	user-select: none;
+}
+
+/* content NAD wszystkim */
+.location__grid{
+	position: relative;
+	z-index: 3;
+
+	/* zamiast translateY – bezpieczne odsunięcie */
+	padding-top: 80px;
+}
+
+/* MOBILE */
+@media (max-width: 640px){
+
+	.section.location{
+		--location-shape-h: 40px;
+	}
+
+	.location__shape{
+		left: 50%;
+		right: auto;
+		top: -2px;
+
+		width: calc(100% + 24px); /* zamiast 100vw */
+		max-width: none;
+
+		height: auto; /* dalej auto */
+		transform: translateX(-50%) scaleY(1.02);
+	}
+}
 
 /* Grid */
 .location__grid{
@@ -141,7 +199,6 @@
 	border-color: var(--color-secondary);
 	color: var(--color-primary);
 }
-
 
 /* ================= RIGHT / MAP ================= */
 
@@ -267,7 +324,6 @@
 	}
 }
 
-
 /* =========================================================
    FIX: Location overflow na mobile (mapa nie wchodzi w galerię)
    ========================================================= */
@@ -295,14 +351,6 @@
 		padding-top: 24px;         /* reguluj */
 	}
 }
-
-@media (max-width: 640px){
-	.section.location{
-		background-position: 49% 75%;
-	}
-}
-
-
 
 /* =========================================================
    LOCATION — arrow color sync z kolorem textu

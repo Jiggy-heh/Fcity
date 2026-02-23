@@ -96,7 +96,7 @@
 	--hero-text-shadow: 0px 4px 14px rgba(0, 0, 0, 0.75);
 	--hero-pad-top: 80px;
 	--hero-gap-subtitle-desc: 35px;
-	--hero-gap-desc-highlight: 110px;
+	--hero-gap-desc-highlight: 50px;
 	--hero-gap-highlight-usp: 35px;
 	--hero-pad-bottom: 100px;
 	--hero-form-w: 566px;
@@ -369,6 +369,14 @@ svg {
 	line-height: 145%;
 }
 
+/* Outline hover */
+.btn--outline:hover {
+	background: var(--color-secondary);
+	border-color: var(--color-secondary);
+	color: var(--color-primary);
+}
+
+
 /* =========================================================
    TEXT + ICON
    ========================================================= */
@@ -434,7 +442,18 @@ svg {
 	}
 }
 
+/* Primary hover – działa i na <a>, i na <button> */
+a.btn.btn--primary:hover,
+button.btn.btn--primary:hover {
+	background: var(--color-third);
+	border-color: var(--color-third);
+	color: var(--color-primary);
+}
 
+a.btn.btn--primary:hover .btn__icon--arrow,
+button.btn.btn--primary:hover .btn__icon--arrow {
+	filter: brightness(0) saturate(100%) invert(18%) sepia(35%) saturate(1180%) hue-rotate(230deg);
+}
 
 
 /* =========================================================
@@ -452,4 +471,83 @@ a.link-secondary {
 
 a.link-secondary:hover {
 	text-decoration: underline;
+}
+
+.apla-sec{
+	position: relative;
+	isolation: isolate;
+	overflow: visible; /* musi być visible, bo tło ma wyjść poza wrapper */
+}
+
+/* WYDŁUŻAMY tło w dół o wysokość paddingu sekcji */
+.apla-sec__bg{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: calc(-1 * var(--section-space)); /* <-- klucz */
+	width: 100%;
+	height: auto;
+	min-height: calc(100% + var(--section-space));
+	object-fit: cover;
+	object-position: center bottom;
+	z-index: -1;
+	pointer-events: none;
+	margin: 0;
+}
+
+/* na mobile sekcje mają mniejszy padding */
+@media (max-width: 640px){
+	.apla-sec__bg{
+		bottom: calc(-1 * var(--section-space-sm));
+		min-height: calc(100% + var(--section-space-sm));
+	}
+}
+
+/* żeby kontakt nie miał własnego tła zakrywającego obraz */
+#kontakt{
+	background: transparent;
+	position: relative;
+	z-index: 1;
+}
+
+
+
+@media (max-width: 1024px){
+	.section--no-top{
+		padding-top: 0;
+	}
+
+	.section--no-bottom{
+		padding-bottom: 0;
+	}
+}
+
+@media (max-width: 640px){
+	.section--no-top{
+		padding-top: 0;
+	}
+
+	.section--no-bottom{
+		padding-bottom: 0;
+	}
+}
+
+
+/* =========================================================
+   BUTTONS — full width mobile
+   ========================================================= */
+
+@media (max-width: 640px){
+
+	.btn.btn--outline{
+		width: 100%;
+		max-width: 100%;
+		justify-content: space-between; /* tekst lewo, ikona prawo */
+	}
+
+	.houses__dev-btn{
+		width: 100%;
+		max-width: 100%;
+	}
 }

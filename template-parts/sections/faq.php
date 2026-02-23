@@ -85,7 +85,12 @@ if ( empty( $section_label ) && empty( $section_title ) && empty( $items ) ) {
 					</div>
 				<?php endforeach; ?>
 			</div>
-			<button class="faq__more" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr( $list_id ); ?>">Zobacz więcej</button>
+			<button class="faq__more btn btn--primary btn--fixed" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr( $list_id ); ?>">
+				<span class="btn__text">Zobacz więcej</span>
+				<span class="btn__icon btn__icon--arrow" aria-hidden="true"></span>
+			</button>
+
+
 		<?php endif; ?>
 
 	</div>

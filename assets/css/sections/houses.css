@@ -564,3 +564,64 @@
 		font-size: 26px;
 	}
 }
+
+
+/* =========================================================
+   HOUSES – MATERIALS (label + title + 3 buttons)
+   ========================================================= */
+
+.houses__materials {
+	width: 100%;
+	max-width: var(--container-max:);
+	margin-top: 60px;
+}
+
+.houses__materials-grid {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	column-gap: 20px; /* GAP między title a przyciskami */
+	align-items: end;
+}
+
+.houses__materials-left .section-title {
+	margin-top: 25px; /* padding/gap między label a title */
+}
+
+.houses__materials-buttons {
+	display: flex;
+	gap: 32px; /* GAP między przyciskami */
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
+.houses__materials .btn:hover {
+	background: var(--color-third);
+	border-color: var(--color-third);
+	color: var(--color-primary);
+}
+
+
+@media (max-width: 991px) {
+	.houses__materials {
+		margin-top: 34px;
+	}
+
+	.houses__materials-grid {
+		grid-template-columns: 1fr;
+		row-gap: 18px;
+		column-gap: 0;
+		align-items: start;
+	}
+
+	.houses__materials-buttons {
+		justify-content: flex-start;
+		gap: 14px;
+	}
+}
+
+@media (max-width: 991px) {
+	.houses__tooltip {
+		display: none !important;
+	}
+}

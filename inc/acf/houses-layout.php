@@ -13,7 +13,7 @@ add_action(
 		acf_add_local_field_group(
 			[
 				'key' => 'group_fc_sections_houses',
-				'title' => 'Sekcje inwestycji (Houses)',
+				'title' => 'Sekcja Domy oraz Standard Wykończenia',
 				'fields' => [
 					[
 						'key' => 'field_fc_sections',
@@ -62,6 +62,38 @@ add_action(
 										'type' => 'text',
 										'default_value' => 'wybierz-dom',
 									],
+									[
+										'key' => 'field_house_materials_label',
+										'label' => 'Materiały – Label',
+										'name' => 'house_materials_label',
+										'type' => 'text',
+									],
+									[
+										'key' => 'field_house_materials_title',
+										'label' => 'Materiały – Title',
+										'name' => 'house_materials_title',
+										'type' => 'text',
+									],
+									[
+										'key' => 'field_house_materials',
+										'label' => 'Materiały – Przyciski',
+										'name' => 'house_materials',
+										'type' => 'repeater',
+										'min' => 0,
+										'max' => 3,
+										'layout' => 'row',
+										'button_label' => 'Dodaj przycisk',
+										'sub_fields' => [
+											[
+												'key' => 'field_house_material_link',
+												'label' => 'Link',
+												'name' => 'material_link',
+												'type' => 'link',
+												'return_format' => 'array',
+											],
+										],
+									],
+									
 								],
 							],
 						],

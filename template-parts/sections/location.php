@@ -42,6 +42,11 @@ $allowed_iframe = [
 ?>
 
 <section class="section section--no-top location" style="background-image:url('<?php echo esc_url( $background_url ); ?>')">
+
+	<img class="location__shape" src="https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/shape_location.svg" alt="" aria-hidden="true">
+	
+	<div class="location__overlay" aria-hidden="true"></div>
+
 	<div class="container location__grid">
 
 		<div class="location__content">
@@ -98,7 +103,7 @@ $allowed_iframe = [
 					<?php endif; ?>
 
 					<?php if ( ! empty( $button_right ) ) : ?>
-						<a href="#kontakt" class="btn btn--fixed location__btn-right">
+						<a href="#wybierz-dom" class="btn btn--fixed location__btn-right">
 							<span class="btn__text"><?php echo esc_html( $button_right ); ?></span>
 							<span class="btn__icon btn__icon--arrow" aria-hidden="true"></span>
 						</a>
@@ -124,3 +129,4 @@ $allowed_iframe = [
 
 	</div>
 </section>
+

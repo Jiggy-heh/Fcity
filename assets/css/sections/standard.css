@@ -1,6 +1,7 @@
 /* ==============================================
    Section: Finish standard
    ============================================== */
+
 .finish-standard {
 	text-align: center;
 }
@@ -9,14 +10,7 @@
 	max-width: var(--houses-content-max);
 }
 
-.finish-standard__head .section-title {
-	margin-top: 25px;
-}
-
-.finish-standard__intro {
-	margin-top: 35px;
-}
-
+/* typo jak było */
 .finish-standard__intro,
 .finish-standard__text {
 	font-family: 'Jost', sans-serif;
@@ -27,6 +21,8 @@
 	color: var(--color-grey);
 }
 
+/* ===== GRID DESKTOP ===== */
+
 .finish-standard__checks {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -34,47 +30,135 @@
 	margin-top: 40px;
 }
 
+/* kolumny (bo robimy karuzelę po kolumnach na mobile) */
+.finish-standard__col {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+}
+
+/* =========================
+   ITEM
+   ========================= */
+
 .finish-standard__item {
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 14px;
+
 	width: 100%;
-	padding: 10px 12px;
-	border: 3px solid transparent;
-	transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+	padding: 8px 18px;
+	min-height: 46px;
+
+	background: transparent;
+	box-sizing: border-box;
 }
 
+/* border całego wiersza – TYLKO NA HOVER */
+.finish-standard__item::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+
+	border: 3px solid transparent;   /* brak borderu normalnie */
+	border-left: 0;
+
+	box-sizing: border-box;
+	pointer-events: none;
+	transition: border-color 0.2s ease;
+}
+
+/* hover – pojawia się żółty border */
+.finish-standard__item:hover::before {
+	border-color: var(--color-secondary);
+}
+
+/* =========================
+   IKONA
+   Normal:
+   - ramka primary „bez lewej ściany” (zaczyna się od left: 18px)
+   - check złoty
+   Hover:
+   - znika ramka (bez skakania)
+   - check zostaje
+   ========================= */
+
 .finish-standard__icon {
-	flex: 0 0 24px;
-	width: 24px;
-	height: 24px;
+	flex: 0 0 46px;
+	width: 46px;
+	height: 46px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	position: relative;
+	box-sizing: border-box;
+}
+
+/* RAMKA (normal) */
+.finish-standard__icon::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+
+	left: 18px;      /* <-- TU REGULUJESZ PRZESUNIĘCIE */
+	right: 0;
+
+	border-top: 3px solid var(--color-primary);
+	border-right: 3px solid var(--color-primary);
+	border-bottom: 3px solid var(--color-primary);
+
+	box-sizing: border-box;
+	pointer-events: none;
+	transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* CHECK (zostaje zawsze) */
+.finish-standard__icon::after {
+	content: "";
+	width: 30px;
+	height: 30px;
+
 	background-image: url('https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/check.svg');
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-position: center;
 }
 
+/* HOVER: znika tylko ramka (check zostaje) */
+.finish-standard__item:hover .finish-standard__icon::before {
+	border-color: transparent;
+	/* ewentualnie zamiast border-color:
+	   opacity: 0;
+	*/
+}
+
+
+/* =========================
+   TEKST
+   - zawsze primary (tak jak mówisz)
+   ========================= */
+
 .finish-standard__item-text {
+	position: relative;
+	z-index: 1;
+
 	font-family: 'Jost', sans-serif;
 	font-weight: 700;
 	font-size: 20px;
 	line-height: 140%;
 	color: var(--color-primary);
 	text-align: left;
+
+	/* żeby border nie “przejeżdżał” po literach */
+	padding-right: 6px;
 }
 
-.finish-standard__item:hover {
-	background-color: var(--color-primary);
-	border-color: var(--color-secondary);
-}
-
-.finish-standard__item:hover .finish-standard__item-text {
-	color: var(--color-secondary);
-}
-
-.finish-standard__item:hover .finish-standard__icon {
-	filter: brightness(0) invert(1);
-}
+/* ===== BOTTOM ===== */
 
 .finish-standard__bottom {
 	margin-top: 60px;
@@ -91,13 +175,57 @@
 	display: none;
 }
 
+
+.finish-standard__item {
+	text-align: left;
+}
+
+.finish-standard__item-text {
+	text-align: left;
+}
+
+/* ===== MOBILE – KARUZELA PO KOLUMNACH ===== */
+
+.finish-standard__item {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 8px 18px;
+}
+
+/* border hover – tylko na szerokość contentu */
+.finish-standard__item::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+
+	left: 35px; /* szerokość checka */
+	right: 0;
+
+	border-top: 3px solid transparent;
+	border-right: 3px solid transparent;
+	border-bottom: 3px solid transparent;
+
+	pointer-events: none;
+	transition: border-color 0.2s ease;
+}
+
+/* hover */
+.finish-standard__item:hover::before {
+	border-color: var(--color-secondary);
+}
+
+
 @media (max-width: 991px) {
+
 	.finish-standard__checks {
 		display: flex;
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
 		scrollbar-width: none;
-		gap: 12px;
+		gap: 16px;
 		padding-bottom: 8px;
 	}
 
@@ -105,7 +233,7 @@
 		display: none;
 	}
 
-	.finish-standard__item {
+	.finish-standard__col {
 		flex: 0 0 100%;
 		scroll-snap-align: start;
 	}

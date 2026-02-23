@@ -37,7 +37,7 @@
 }
 
 .contact__content {
-	padding-top: 177px;
+	padding-top: 210px;
 	max-width: 760px;
 	color: var(--color-white);
 }
@@ -115,14 +115,26 @@
 }
 
 .contact__btn--email {
-	border-color: #E8E1F3;
-	color: #E8E1F3;
+	background-color: var(--color-third);
+	color: var(--color-primary);
 }
 
 .contact__btn--phone {
 	background: var(--color-secondary);
 	color: var(--color-primary);
 }
+
+
+.contact__btn--email:hover {
+	background: var(--color-secondary);
+	color: var(--color-primary);
+}
+
+.contact__btn--phone:hover { 
+	background: var(--color-third);
+	color: var(--color-primary);
+}
+
 
 .contact__form {
 	padding-top: 120px;

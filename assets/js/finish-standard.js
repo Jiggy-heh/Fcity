@@ -1,15 +1,15 @@
 (function () {
 	const mobileQuery = window.matchMedia('(max-width: 991px)');
 
-	const scrollByItem = (track, direction) => {
-		const firstItem = track.querySelector('.finish-standard__item');
-		if (!firstItem) {
+	const scrollByColumn = (track, direction) => {
+		const firstCol = track.querySelector('.finish-standard__col');
+		if (!firstCol) {
 			return;
 		}
 
-		const itemWidth = firstItem.getBoundingClientRect().width;
+		const colWidth = firstCol.getBoundingClientRect().width;
 		track.scrollBy({
-			left: direction * itemWidth,
+			left: direction * colWidth,
 			behavior: 'smooth',
 		});
 	};
@@ -29,7 +29,7 @@
 				}
 
 				const dir = button.dataset.dir === 'prev' ? -1 : 1;
-				scrollByItem(track, dir);
+				scrollByColumn(track, dir);
 			});
 		});
 	};
