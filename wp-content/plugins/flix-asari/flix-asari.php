@@ -18,6 +18,7 @@ final class Flix_Asari_Plugin {
 
 	// SITE API (wg dokumentacji: /site + nagłówek SiteAuth: userId:Token)
 	const API_BASE              = 'https://api.asari.pro/site';
+	const API_APPENDIX_BASE     = 'https://api.asari.pro/apiAppendix';
 	const SITE_USER_ID          = 80087;
 
 	const MIN_REQUEST_INTERVAL  = 3;
@@ -29,6 +30,7 @@ final class Flix_Asari_Plugin {
 	 */
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'register_house_post_type_and_meta' ] );
+		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 		add_filter( 'cron_schedules', [ __CLASS__, 'register_cron_schedule' ] );
 		add_action( 'admin_post_flix_asari_run_sync_now', [ __CLASS__, 'handle_run_sync_now' ] );		
 		add_action( self::CRON_HOOK, [ __CLASS__, 'run_cron_sync' ] );
@@ -101,6 +103,8 @@ final class Flix_Asari_Plugin {
 			'asari_availability'      => 'string',
 			'asari_price_amount'      => 'number',
 			'asari_price_currency'    => 'string',
+			'asari_total_area'        => 'number',
+			'asari_no_of_rooms'       => 'integer',
 
 			'asari_card_appendix_id'  => 'integer',
 			'asari_card_file_name'    => 'string',
@@ -123,6 +127,33 @@ final class Flix_Asari_Plugin {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Register public REST routes used by front-end houses section.
+	 *
+	 * @return void
+	 */
+	public static function register_rest_routes() {
+		register_rest_route(
+			'flix-asari/v1',
+			'/houses',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ __CLASS__, 'rest_get_houses' ],
+				'permission_callback' => '__return_true',
+			]
+		);
+
+		register_rest_route(
+			'flix-asari/v1',
+			'/appendix/(?P<id>\d+)',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ __CLASS__, 'rest_proxy_appendix' ],
+				'permission_callback' => '__return_true',
+			]
+		);
 	}
 
 	/**
@@ -434,12 +465,285 @@ final class Flix_Asari_Plugin {
 			}
 		}
 
+		if ( isset( $listing['totalArea'] ) ) {
+			update_post_meta( $post_id, 'asari_total_area', (float) $listing['totalArea'] );
+		}
+
+		if ( isset( $listing['noOfRooms'] ) ) {
+			update_post_meta( $post_id, 'asari_no_of_rooms', (int) $listing['noOfRooms'] );
+		}
+
+		$availability_id = self::extract_availability_id( $listing );
+		if ( $availability_id > 0 ) {
+			update_post_meta( $post_id, 'asari_availability', (string) $availability_id );
+		}
+
+		$appendix_id = self::fetch_listing_pdf_appendix_id( $asari_id );
+		if ( $appendix_id > 0 ) {
+			update_post_meta( $post_id, 'asari_card_appendix_id', $appendix_id );
+		}
+
 		self::log_error( 'Listing synced: ' . self::truncate_for_log( wp_json_encode( $debug ) ) );
 
 		return [
 			'post_id'  => (int) $post_id,
 			'asari_id' => $asari_id,
 		];
+	}
+
+	/**
+	 * REST endpoint: return houses list for front-end map.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public static function rest_get_houses() {
+		$posts = get_posts(
+			[
+				'post_type'              => 'fc_house',
+				'post_status'            => 'publish',
+				'posts_per_page'         => -1,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+			]
+		);
+
+		$data = [];
+
+		foreach ( $posts as $post ) {
+			$post_id = (int) $post->ID;
+			$number  = (string) get_post_meta( $post_id, 'house_number', true );
+
+			if ( '' === $number ) {
+				continue;
+			}
+
+			$appendix_id = (int) get_post_meta( $post_id, 'asari_card_appendix_id', true );
+			$plan_url    = (string) get_post_meta( $post_id, 'plan_url', true );
+
+			if ( $appendix_id > 0 ) {
+				$plan_url = rest_url( 'flix-asari/v1/appendix/' . $appendix_id );
+			}
+
+			$data[] = [
+				'number'    => $number,
+				'status'    => self::resolve_house_status( $post_id ),
+				'price'     => (float) get_post_meta( $post_id, 'asari_price_amount', true ),
+				'currency'  => (string) get_post_meta( $post_id, 'asari_price_currency', true ),
+				'area'      => (float) get_post_meta( $post_id, 'asari_total_area', true ),
+				'rooms'     => (int) get_post_meta( $post_id, 'asari_no_of_rooms', true ),
+				'plan_url'  => $plan_url,
+				'dims_url'  => (string) get_post_meta( $post_id, 'dims_url', true ),
+				'model_img' => wp_get_attachment_image_url( (int) get_post_meta( $post_id, 'model_img', true ), 'full' ),
+			];
+		}
+
+		return new WP_REST_Response(
+			[
+				'success' => true,
+				'data'    => $data,
+			],
+			200
+		);
+	}
+
+	/**
+	 * REST endpoint: proxy appendix file from ASARI apiAppendix.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|void
+	 */
+	public static function rest_proxy_appendix( WP_REST_Request $request ) {
+		$appendix_id = (int) $request->get_param( 'id' );
+		$token       = self::load_api_token();
+
+		if ( $appendix_id <= 0 ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => 'Invalid appendix id.' ], 400 );
+		}
+
+		if ( '' === $token ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => 'Missing ASARI token.' ], 500 );
+		}
+
+		$response = wp_remote_get(
+			add_query_arg( [ 'id' => $appendix_id ], self::API_APPENDIX_BASE . '/get' ),
+			[
+				'timeout' => 45,
+				'headers' => [
+					'Authorization' => 'Bearer ' . $token,
+				],
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => $response->get_error_message() ], 502 );
+		}
+
+		$code         = (int) wp_remote_retrieve_response_code( $response );
+		$body         = wp_remote_retrieve_body( $response );
+		$content_type = wp_remote_retrieve_header( $response, 'content-type' );
+
+		if ( $code < 200 || $code >= 300 ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => 'Upstream returned HTTP ' . $code ], 502 );
+		}
+
+		if ( empty( $content_type ) ) {
+			$content_type = 'application/pdf';
+		}
+
+		nocache_headers();
+		header( 'Content-Type: ' . $content_type );
+		header( 'Content-Disposition: inline; filename="document-' . $appendix_id . '.pdf"' );
+		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit;
+	}
+
+	/**
+	 * Map post-level status with override support.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	private static function resolve_house_status( $post_id ) {
+		$override = sanitize_key( (string) get_post_meta( $post_id, 'status_override', true ) );
+
+		if ( in_array( $override, [ 'available', 'sold', 'reserved' ], true ) ) {
+			return $override;
+		}
+
+		$availability_id = (string) get_post_meta( $post_id, 'asari_availability', true );
+
+		if ( '40800' === $availability_id ) {
+			return 'sold';
+		}
+
+		if ( '40799' === $availability_id ) {
+			return 'available';
+		}
+
+		return 'available';
+	}
+
+	/**
+	 * Extract customField_33480 dictionary id from listing payload.
+	 *
+	 * @param array<string,mixed> $listing Listing payload.
+	 * @return int
+	 */
+	private static function extract_availability_id( $listing ) {
+		if ( isset( $listing['customField_33480'] ) ) {
+			$field = $listing['customField_33480'];
+			if ( is_numeric( $field ) ) {
+				return (int) $field;
+			}
+			if ( is_array( $field ) ) {
+				if ( isset( $field['id'] ) && is_numeric( $field['id'] ) ) {
+					return (int) $field['id'];
+				}
+				if ( isset( $field['dictionaryItemId'] ) && is_numeric( $field['dictionaryItemId'] ) ) {
+					return (int) $field['dictionaryItemId'];
+				}
+			}
+		}
+
+		if ( isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ) {
+			foreach ( $listing['customFields'] as $field ) {
+				if ( ! is_array( $field ) ) {
+					continue;
+				}
+				$field_id = isset( $field['id'] ) ? (int) $field['id'] : 0;
+				if ( 33480 !== $field_id ) {
+					continue;
+				}
+
+				if ( isset( $field['value'] ) && is_numeric( $field['value'] ) ) {
+					return (int) $field['value'];
+				}
+				if ( isset( $field['dictionaryItemId'] ) && is_numeric( $field['dictionaryItemId'] ) ) {
+					return (int) $field['dictionaryItemId'];
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Fetch first PDF appendix id for listing.
+	 *
+	 * @param int $listing_id Listing ID.
+	 * @return int
+	 */
+	private static function fetch_listing_pdf_appendix_id( $listing_id ) {
+		$token = self::load_api_token();
+
+		if ( '' === $token || $listing_id <= 0 ) {
+			return 0;
+		}
+
+		$url      = add_query_arg(
+			[
+				'objectId'        => $listing_id,
+				'objectClassName' => 'Listing',
+				'start'           => 0,
+				'limit'           => 50,
+			],
+			self::API_APPENDIX_BASE . '/list'
+		);
+		$response = wp_remote_get(
+			$url,
+			[
+				'timeout' => 30,
+				'headers' => [
+					'Authorization' => 'Bearer ' . $token,
+					'Accept'        => 'application/json',
+				],
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			self::log_error( 'Appendix list request failed listing=' . (int) $listing_id . ' err=' . $response->get_error_message() );
+			return 0;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		$body = (string) wp_remote_retrieve_body( $response );
+
+		if ( $code < 200 || $code >= 300 ) {
+			self::log_error( 'Appendix list request HTTP=' . $code . ' listing=' . (int) $listing_id );
+			return 0;
+		}
+
+		$payload = json_decode( $body, true );
+		if ( ! is_array( $payload ) ) {
+			return 0;
+		}
+
+		$items = [];
+		if ( isset( $payload['data'] ) && is_array( $payload['data'] ) ) {
+			$items = $payload['data'];
+			if ( isset( $payload['data']['items'] ) && is_array( $payload['data']['items'] ) ) {
+				$items = $payload['data']['items'];
+			}
+		} elseif ( isset( $payload['items'] ) && is_array( $payload['items'] ) ) {
+			$items = $payload['items'];
+		} elseif ( array_keys( $payload ) === range( 0, count( $payload ) - 1 ) ) {
+			$items = $payload;
+		}
+
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$content_type = isset( $item['contentType'] ) ? (string) $item['contentType'] : '';
+			$item_id      = isset( $item['id'] ) ? (int) $item['id'] : 0;
+
+			if ( 'application/pdf' === strtolower( $content_type ) && $item_id > 0 ) {
+				return $item_id;
+			}
+		}
+
+		return 0;
 	}
 
 

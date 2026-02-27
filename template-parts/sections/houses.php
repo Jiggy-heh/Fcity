@@ -66,7 +66,7 @@ if ( empty( $materials_title ) ) {
 	$materials_title = 'Pobierz materiały';
 }
 ?>
-<section class="section houses is-step-1" id="<?php echo esc_attr( $section_id ); ?>">
+<section class="section houses is-step-1" id="<?php echo esc_attr( $section_id ); ?>" data-houses-endpoint="<?php echo esc_url( rest_url( 'flix-asari/v1/houses' ) ); ?>">
 	<div class="container houses__inner">
 		<div class="houses__head">
 			<div class="houses__head-left">
@@ -172,6 +172,7 @@ if ( empty( $materials_title ) ) {
 					<div class="houses__stats">
 						<div class="houses__stat"><span class="houses__stat-label">Cena:</span> <span class="houses__stat-value" data-house-price>—</span></div>
 						<div class="houses__stat"><span class="houses__stat-label">Powierzchnia:</span> <span class="houses__stat-value" data-house-area>—</span></div>
+						<div class="houses__stat"><span class="houses__stat-label">Liczba pokoi:</span> <span class="houses__stat-value" data-house-rooms>—</span></div>
 						<div class="houses__stat"><span class="houses__stat-label">Działka:</span> <span class="houses__stat-value" data-house-plot>—</span></div>
 					</div>
 					<div class="houses__actions">
