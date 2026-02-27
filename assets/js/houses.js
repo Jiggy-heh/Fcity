@@ -5,16 +5,18 @@
 		sold: 'Sprzedany',
 	};
 
-	const housesMock = [
-		{ number: '1', status: 'available', price: 'od 500 000 zł', area: '120 m²', plot: '500 m²', plan_url: '#plan-1', dims_url: '#dims-1', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '2', status: 'reserved', price: 'od 530 000 zł', area: '118 m²', plot: '470 m²', plan_url: '#plan-2', dims_url: '#dims-2', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '3', status: 'sold', price: 'sprzedany', area: '116 m²', plot: '455 m²', plan_url: '#plan-3', dims_url: '#dims-3', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '4', status: 'available', price: 'od 560 000 zł', area: '126 m²', plot: '535 m²', plan_url: '#plan-4', dims_url: '#dims-4', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '5', status: 'reserved', price: 'od 545 000 zł', area: '122 m²', plot: '505 m²', plan_url: '#plan-5', dims_url: '#dims-5', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '6', status: 'available', price: 'od 590 000 zł', area: '132 m²', plot: '610 m²', plan_url: '#plan-6', dims_url: '#dims-6', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '7', status: 'available', price: 'od 570 000 zł', area: '124 m²', plot: '520 m²', plan_url: '#plan-7', dims_url: '#dims-7', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-		{ number: '8', status: 'reserved', price: 'od 540 000 zł', area: '119 m²', plot: '485 m²', plan_url: '#plan-8', dims_url: '#dims-8', model_img: 'https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/model_3d_przyklad.png' },
-	];
+	const formatPrice = (value, currency) => {
+		const amount = Number(value);
+		if (!Number.isFinite(amount) || amount <= 0) return '—';
+		const fmt = new Intl.NumberFormat('pl-PL').format(amount);
+		return currency ? `${fmt} ${currency}` : fmt;
+	};
+
+	const formatArea = (value) => {
+		const amount = Number(value);
+		if (!Number.isFinite(amount) || amount <= 0) return '—';
+		return `${String(amount).replace('.', ',')} m²`;
+	};
 
 
 	function setStep(root, step) {
@@ -32,6 +34,7 @@
 		const fieldPrice = root.querySelector('[data-house-price]');
 		const fieldArea = root.querySelector('[data-house-area]');
 		const fieldPlot = root.querySelector('[data-house-plot]');
+		const fieldRooms = root.querySelector('[data-house-rooms]');
 		const linkPlan = root.querySelector('[data-house-plan]');
 		const linkDims = root.querySelector('[data-house-dims]');
 		const modelImg = root.querySelector('[data-house-model]');
@@ -39,6 +42,23 @@
 		if (!stage || !overlay) {
 			return;
 		}
+
+		const endpoint = root.dataset.housesEndpoint || '';
+		let housesData = [];
+
+		const fetchHouses = async () => {
+			if (!endpoint) return;
+			try {
+				const response = await fetch(endpoint, { credentials: 'same-origin' });
+				if (!response.ok) return;
+				const payload = await response.json();
+				if (payload && payload.success && Array.isArray(payload.data)) {
+					housesData = payload.data;
+				}
+			} catch (e) {
+				// noop
+			}
+		};
 
 		const getVisibleShapes = () => {
 			return Array.from(root.querySelectorAll('.houses__shape')).filter((el) => {
@@ -61,7 +81,7 @@
 				shape.dataset.bound = '1';
 
 				const houseNumber = shape.dataset.house;
-				const data = housesMock.find((item) => item.number === houseNumber);
+				const data = housesData.find((item) => String(item.number) === String(houseNumber));
 				if (!data) return;
 
 				shape.classList.add(`is-${data.status}`);
@@ -92,12 +112,23 @@
 					shape.classList.add('is-active');
 
 
-					fieldPrice.textContent = data.price;
-					fieldArea.textContent = data.area;
-					fieldPlot.textContent = data.plot;
-					linkPlan.href = data.plan_url;
-					linkDims.href = data.dims_url;
-					modelImg.src = data.model_img;
+					fieldPrice.textContent = formatPrice(data.price, data.currency);
+					fieldArea.textContent = formatArea(data.area);
+					if (fieldRooms) fieldRooms.textContent = data.rooms ? String(data.rooms) : '—';
+					if (fieldPlot) fieldPlot.textContent = '—';
+					if (linkPlan && data.plan_url) {
+						linkPlan.href = data.plan_url;
+						linkPlan.target = '_blank';
+						linkPlan.rel = 'noopener';
+					}
+					if (linkDims && data.dims_url) {
+						linkDims.href = data.dims_url;
+						linkDims.target = '_blank';
+						linkDims.rel = 'noopener';
+					}
+					if (modelImg && data.model_img) {
+						modelImg.src = data.model_img;
+					}
 
 					setStep(root, 3);
 					expanded.classList.add('is-visible');
@@ -113,7 +144,7 @@
 			});
 		};
 
-		bindShapes();
+		fetchHouses().then(bindShapes);
 
 		const activateStepTwo = () => {
 			if (root.classList.contains('is-step-1')) {
