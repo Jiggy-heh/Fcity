@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Flix Asari
- * Description: Foundation plugin for Asari integration and houses CPT.
- * Version: 0.2.0
+ * Description: Foundation plugin for Asari SITE API integration and houses CPT.
+ * Version: 0.3.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,7 +15,11 @@ final class Flix_Asari_Plugin {
 	const TRANSIENT_THROTTLE_TS = 'flix_asari_last_request_ts';
 	const CRON_HOOK             = 'flix_asari_cron_sync';
 	const CRON_SCHEDULE         = 'flix_asari_every_ten_minutes';
-	const API_BASE              = 'https://api.asari.pro';
+
+	// SITE API (wg dokumentacji: /site + nagłówek SiteAuth: userId:Token)
+	const API_BASE              = 'https://api.asari.pro/site';
+	const SITE_USER_ID          = 80087;
+
 	const MIN_REQUEST_INTERVAL  = 3;
 
 	/**
@@ -26,6 +30,7 @@ final class Flix_Asari_Plugin {
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'register_house_post_type_and_meta' ] );
 		add_filter( 'cron_schedules', [ __CLASS__, 'register_cron_schedule' ] );
+		add_action( 'admin_post_flix_asari_run_sync_now', [ __CLASS__, 'handle_run_sync_now' ] );		
 		add_action( self::CRON_HOOK, [ __CLASS__, 'run_cron_sync' ] );
 		add_action( 'admin_menu', [ __CLASS__, 'register_admin_page' ] );
 		add_action( 'admin_init', [ __CLASS__, 'register_settings' ] );
@@ -43,6 +48,28 @@ final class Flix_Asari_Plugin {
 	 *
 	 * @return void
 	 */
+
+	public static function handle_run_sync_now() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized', 'flix-asari' ) );
+		}
+
+		check_admin_referer( 'flix_asari_run_sync_now', 'flix_asari_run_sync_now_nonce' );
+
+		$result = self::sync_listings( false );
+
+		$status = is_wp_error( $result ) ? 'fail' : 'ok';
+
+		if ( is_wp_error( $result ) ) {
+			self::log_error( 'Manual sync failed: ' . $result->get_error_message() );
+		} else {
+			self::log_error( 'Manual sync OK. Processed=' . (int) $result['processed'] );
+		}
+
+		wp_safe_redirect( admin_url( 'options-general.php?page=flix-asari&flix_asari_sync=' . $status ) );
+		exit;
+	}
+
 	public static function register_house_post_type_and_meta() {
 		register_post_type(
 			'fc_house',
@@ -61,18 +88,24 @@ final class Flix_Asari_Plugin {
 
 		$meta_keys = [
 			'asari_id'                => 'integer',
+			'asari_listing_id'         => 'string',
+			'asari_last_updated'       => 'integer',
+
 			'house_number'            => 'string',
 			'status_override'         => 'string',
 			'plan_url'                => 'string',
 			'dims_url'                => 'string',
 			'model_img'               => 'integer',
+
 			'asari_status'            => 'string',
 			'asari_availability'      => 'string',
 			'asari_price_amount'      => 'number',
 			'asari_price_currency'    => 'string',
+
 			'asari_card_appendix_id'  => 'integer',
 			'asari_card_file_name'    => 'string',
 			'asari_card_url'          => 'string',
+
 			'asari_last_sync'         => 'integer',
 		];
 
@@ -155,25 +188,7 @@ final class Flix_Asari_Plugin {
 			return;
 		}
 
-		$settings = self::get_settings();
-		$section  = isset( $settings['section'] ) ? $settings['section'] : '';
-		$status   = isset( $settings['status'] ) ? $settings['status'] : 'Active';
-
-		if ( '' === $section ) {
-			self::log_error( 'Cron sync skipped: section is empty.' );
-			self::release_sync_lock();
-			return;
-		}
-
-		$result = self::sync_listings(
-			[
-				'section' => $section,
-				'status'  => $status,
-				'limit'   => 25,
-				'page'    => 1,
-			],
-			false
-		);
+		$result = self::sync_listings( false );
 
 		if ( is_wp_error( $result ) ) {
 			self::log_error( sprintf( 'Cron sync failed: %s', $result->get_error_message() ) );
@@ -185,36 +200,21 @@ final class Flix_Asari_Plugin {
 	/**
 	 * WP-CLI entrypoint.
 	 *
-	 * @param array<int,string> $args Positional arguments.
+	 * @param array<int,string>   $args Positional arguments.
 	 * @param array<string,mixed> $assoc_args Flag arguments.
 	 * @return void
 	 */
 	public static function cli_sync( $args, $assoc_args ) {
-		unset( $args );
-
-		$section = isset( $assoc_args['section'] ) ? sanitize_text_field( (string) $assoc_args['section'] ) : '';
-		$status  = isset( $assoc_args['status'] ) ? sanitize_text_field( (string) $assoc_args['status'] ) : 'Active';
-		$limit   = isset( $assoc_args['limit'] ) ? max( 1, (int) $assoc_args['limit'] ) : 25;
-		$page    = isset( $assoc_args['page'] ) ? max( 1, (int) $assoc_args['page'] ) : 1;
-
-		if ( '' === $section ) {
-			\WP_CLI::error( 'Parametr --section jest wymagany.' );
-		}
+		unset( $args, $assoc_args );
 
 		if ( ! self::acquire_sync_lock() ) {
 			\WP_CLI::error( 'Sync już trwa (lock aktywny).' );
 		}
 
-		\WP_CLI::log( sprintf( 'Start sync: section=%s status=%s limit=%d page=%d', $section, $status, $limit, $page ) );
-		$result = self::sync_listings(
-			[
-				'section' => $section,
-				'status'  => $status,
-				'limit'   => $limit,
-				'page'    => $page,
-			],
-			true
-		);
+		\WP_CLI::log( 'Start sync (SITE API).' );
+
+		$result = self::sync_listings( true );
+
 		self::release_sync_lock();
 
 		if ( is_wp_error( $result ) ) {
@@ -224,47 +224,233 @@ final class Flix_Asari_Plugin {
 		\WP_CLI::success( sprintf( 'Sync zakończony. Przetworzono: %d.', (int) $result['processed'] ) );
 	}
 
+
+
+	private static function diagnostic_ping() {
+		$response = self::api_request(
+			'GET',
+			'/i18nMessages',
+			[
+				'locale' => 'pl',
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			self::log_error( 'Diagnostic ping FAIL: ' . $response->get_error_message() );
+			return;
+		}
+
+		self::log_error( 'Diagnostic ping OK. Raw=' . self::truncate_for_log( wp_json_encode( $response ) ) );
+	}
+
 	/**
-	 * Sync listings from Asari.
+	 * Sync listings from Asari SITE API.
 	 *
-	 * @param array<string,mixed> $params Filters.
-	 * @param bool                $verbose Output to CLI.
+	 * Flow:
+	 * 1) POST /exportedListingIdList -> lista ID + lastUpdated
+	 * 2) dla każdego ID: POST /listing?id=ID -> pełny listing
+	 * 3) zapis do CPT fc_house
+	 *
+	 * @param bool $verbose Output to CLI.
 	 * @return array<string,mixed>|WP_Error
 	 */
-	private static function sync_listings( $params, $verbose ) {
-		$api_response = self::api_request( 'GET', '/apiListing/list', $params );
+	private static function sync_listings( $verbose ) {
+		unset( $verbose );
 
-		if ( is_wp_error( $api_response ) ) {
-			return $api_response;
+		$settings = self::get_settings();
+
+		$limit = isset( $settings['limit'] ) ? max( 1, (int) $settings['limit'] ) : 25;
+
+		self::log_error( 'Sync start. limit=' . $limit );
+		self::diagnostic_ping();		
+
+		$id_list_response = self::api_request(
+			'POST',
+			'/exportedListingIdList',
+			[]
+		);
+
+		if ( is_wp_error( $id_list_response ) ) {
+			return $id_list_response;
 		}
 
-		$listings = self::extract_listings( $api_response );
+		$ids = self::extract_exported_listing_ids( $id_list_response );
+
+		self::log_error( 'exportedListingIdList: ids_count=' . count( $ids ) );
+
+		if ( empty( $ids ) ) {
+			self::log_error( 'No listing ids returned. Raw=' . self::truncate_for_log( wp_json_encode( $id_list_response ) ) );
+			return [
+				'processed' => 0,
+			];
+		}
+
 		$processed = 0;
 
-		foreach ( $listings as $listing ) {
-			$result = self::sync_single_listing( $listing );
-			if ( is_wp_error( $result ) ) {
-				self::log_error( sprintf( 'Listing sync error: %s', $result->get_error_message() ) );
+		$ids = array_slice( $ids, 0, $limit );
+
+		foreach ( $ids as $listing_id ) {
+			self::log_error( 'Fetching listing id=' . (int) $listing_id );
+
+			$listing = self::api_request(
+				'POST',
+				'/listing',
+				[
+					'id' => (int) $listing_id,
+				]
+			);
+
+			if ( is_wp_error( $listing ) ) {
+				self::log_error( 'Listing fetch failed id=' . (int) $listing_id . ' err=' . $listing->get_error_message() );
 				continue;
 			}
-			$processed++;
-			if ( $verbose && defined( 'WP_CLI' ) && WP_CLI ) {
-				\WP_CLI::log( sprintf( 'Zsynchronizowano listing ID %d -> post %d.', (int) $result['asari_id'], (int) $result['post_id'] ) );
+
+			if ( ! is_array( $listing ) ) {
+				self::log_error( 'Listing invalid payload id=' . (int) $listing_id . ' raw=' . self::truncate_for_log( wp_json_encode( $listing ) ) );
+				continue;
 			}
+
+			$listing_obj = self::extract_listing_object( $listing );
+
+			if ( empty( $listing_obj ) || ! is_array( $listing_obj ) ) {
+				self::log_error( 'Listing missing data object id=' . (int) $listing_id . ' raw=' . self::truncate_for_log( wp_json_encode( $listing ) ) );
+				continue;
+			}
+
+			$result = self::sync_single_site_listing( $listing_obj );
+
+			if ( is_wp_error( $result ) ) {
+				self::log_error( 'Listing sync error id=' . (int) $listing_id . ' err=' . $result->get_error_message() );
+				continue;
+			}
+
+			$processed++;
 		}
+
+		self::log_error( 'Sync done. processed=' . $processed );
 
 		return [
 			'processed' => $processed,
 		];
 	}
 
+	private static function extract_exported_listing_ids( $response ) {
+		$ids = [];
+
+		if ( is_array( $response ) ) {
+			// Najczęściej: ["data" => [...]] albo bezpośrednio lista.
+			$candidate = $response;
+
+			if ( isset( $response['data'] ) ) {
+				$candidate = $response['data'];
+			}
+
+			if ( is_array( $candidate ) ) {
+				foreach ( $candidate as $row ) {
+					if ( is_array( $row ) ) {
+						// Spotykane pola: listingId / id
+						if ( isset( $row['listingId'] ) ) {
+							$ids[] = (int) $row['listingId'];
+						} elseif ( isset( $row['id'] ) ) {
+							$ids[] = (int) $row['id'];
+						}
+					} elseif ( is_numeric( $row ) ) {
+						$ids[] = (int) $row;
+					}
+				}
+			}
+		}
+
+		$ids = array_values( array_filter( array_unique( $ids ) ) );
+
+		if ( ! empty( $ids ) ) {
+			self::log_error( 'IDs sample: ' . implode( ',', array_slice( $ids, 0, 10 ) ) );
+		}
+
+		return $ids;
+	}
+
+	private static function sync_single_site_listing( $listing ) {
+		// SITE /listing zwraca “Listing object” (wg doc). My musimy wyciągnąć ID i name.
+		$asari_id = 0;
+
+		if ( isset( $listing['id'] ) ) {
+			$asari_id = (int) $listing['id'];
+		} elseif ( isset( $listing['listingId'] ) ) {
+			$asari_id = (int) $listing['listingId'];
+		}
+
+		if ( $asari_id <= 0 ) {
+			return new WP_Error( 'invalid_listing', 'Brak ID w payloadzie listingu.' );
+		}
+
+		$name = '';
+		if ( isset( $listing['name'] ) ) {
+			$name = sanitize_text_field( (string) $listing['name'] );
+		}
+
+		$post_id = self::find_house_by_asari_id( $asari_id );
+
+		if ( ! $post_id ) {
+			$post_id = wp_insert_post(
+				[
+					'post_type'   => 'fc_house',
+					'post_status' => 'publish',
+					'post_title'  => '' !== $name ? $name : sprintf( 'Listing %d', $asari_id ),
+				]
+			);
+
+			if ( is_wp_error( $post_id ) ) {
+				return $post_id;
+			}
+
+			self::log_error( 'Created post_id=' . (int) $post_id . ' for asari_id=' . $asari_id );
+		} else {
+			self::log_error( 'Updating post_id=' . (int) $post_id . ' for asari_id=' . $asari_id );
+		}
+
+		update_post_meta( $post_id, 'asari_id', $asari_id );
+		update_post_meta( $post_id, 'asari_last_sync', time() );
+
+		// Debug: zaloguj kilka kluczowych pól żeby widzieć co wchodzi.
+		$debug = [
+			'id'   => $asari_id,
+			'name' => $name,
+		];
+
+		if ( isset( $listing['status'] ) ) {
+			$debug['status'] = (string) $listing['status'];
+			update_post_meta( $post_id, 'asari_status', sanitize_text_field( (string) $listing['status'] ) );
+		}
+
+		if ( isset( $listing['price'] ) && is_array( $listing['price'] ) ) {
+			if ( isset( $listing['price']['amount'] ) ) {
+				update_post_meta( $post_id, 'asari_price_amount', (float) $listing['price']['amount'] );
+				$debug['price_amount'] = (string) $listing['price']['amount'];
+			}
+			if ( isset( $listing['price']['currency'] ) ) {
+				update_post_meta( $post_id, 'asari_price_currency', sanitize_text_field( (string) $listing['price']['currency'] ) );
+				$debug['price_currency'] = (string) $listing['price']['currency'];
+			}
+		}
+
+		self::log_error( 'Listing synced: ' . self::truncate_for_log( wp_json_encode( $debug ) ) );
+
+		return [
+			'post_id'  => (int) $post_id,
+			'asari_id' => $asari_id,
+		];
+	}
+
+
 	/**
 	 * Sync a single listing.
 	 *
-	 * @param array<string,mixed> $listing Listing payload.
+	 * @param array<string,mixed> $listing Listing payload (Listing object).
+	 * @param int                 $last_updated lastUpdated z exportedListingIdList (jeśli jest).
 	 * @return array<string,int>|WP_Error
 	 */
-	private static function sync_single_listing( $listing ) {
+	private static function sync_single_listing( $listing, $last_updated ) {
 		$asari_id = isset( $listing['id'] ) ? (int) $listing['id'] : 0;
 
 		if ( $asari_id <= 0 ) {
@@ -272,9 +458,11 @@ final class Flix_Asari_Plugin {
 		}
 
 		$post_id = self::find_house_by_asari_id( $asari_id );
+
 		if ( ! $post_id ) {
 			$post_title = isset( $listing['name'] ) ? sanitize_text_field( (string) $listing['name'] ) : sprintf( 'Listing %d', $asari_id );
-			$post_id    = wp_insert_post(
+
+			$post_id = wp_insert_post(
 				[
 					'post_type'   => 'fc_house',
 					'post_status' => 'publish',
@@ -289,121 +477,31 @@ final class Flix_Asari_Plugin {
 
 		$price_amount   = '';
 		$price_currency = '';
+
 		if ( isset( $listing['price'] ) && is_array( $listing['price'] ) ) {
 			$price_amount   = isset( $listing['price']['amount'] ) ? (float) $listing['price']['amount'] : '';
 			$price_currency = isset( $listing['price']['currency'] ) ? sanitize_text_field( (string) $listing['price']['currency'] ) : '';
 		}
 
-		$availability = isset( $listing['customField_33480'] ) ? sanitize_text_field( (string) $listing['customField_33480'] ) : '';
 		$status       = isset( $listing['status'] ) ? sanitize_text_field( (string) $listing['status'] ) : '';
+		$listing_id   = isset( $listing['listingId'] ) ? sanitize_text_field( (string) $listing['listingId'] ) : '';
 
 		update_post_meta( $post_id, 'asari_id', $asari_id );
+		update_post_meta( $post_id, 'asari_listing_id', $listing_id );
 		update_post_meta( $post_id, 'asari_status', $status );
-		update_post_meta( $post_id, 'asari_availability', $availability );
 		update_post_meta( $post_id, 'asari_price_amount', $price_amount );
 		update_post_meta( $post_id, 'asari_price_currency', $price_currency );
+
+		if ( $last_updated > 0 ) {
+			update_post_meta( $post_id, 'asari_last_updated', $last_updated );
+		}
+
 		update_post_meta( $post_id, 'asari_last_sync', time() );
 
-		$card_data = self::find_best_card_appendix( $asari_id );
-		if ( ! is_wp_error( $card_data ) && ! empty( $card_data ) ) {
-			update_post_meta( $post_id, 'asari_card_appendix_id', (int) $card_data['id'] );
-			update_post_meta( $post_id, 'asari_card_file_name', (string) $card_data['file_name'] );
-			update_post_meta( $post_id, 'asari_card_url', (string) $card_data['url'] );
-		}
-
 		return [
-			'post_id'   => (int) $post_id,
-			'asari_id'  => $asari_id,
+			'post_id'  => (int) $post_id,
+			'asari_id' => $asari_id,
 		];
-	}
-
-	/**
-	 * Find best matching appendix for listing card.
-	 *
-	 * @param int $listing_id Listing ID.
-	 * @return array<string,mixed>|WP_Error
-	 */
-	private static function find_best_card_appendix( $listing_id ) {
-		$list_response = self::api_request(
-			'GET',
-			'/apiAppendix/list',
-			[
-				'objectClassName' => 'Listing',
-				'objectId'        => $listing_id,
-			]
-		);
-
-		if ( is_wp_error( $list_response ) ) {
-			return $list_response;
-		}
-
-		$appendixes = self::extract_listings( $list_response );
-		if ( empty( $appendixes ) ) {
-			return [];
-		}
-
-		$keywords     = [ 'karta', 'lokal', 'rzut', 'plan' ];
-		$best_appendix = null;
-		$best_score    = -1;
-
-		foreach ( $appendixes as $appendix ) {
-			$file_name    = isset( $appendix['name'] ) ? mb_strtolower( (string) $appendix['name'] ) : '';
-			$content_type = isset( $appendix['contentType'] ) ? mb_strtolower( (string) $appendix['contentType'] ) : '';
-			$score        = 0;
-
-			if ( 'application/pdf' === $content_type ) {
-				$score += 10;
-			}
-
-			foreach ( $keywords as $keyword ) {
-				if ( false !== strpos( $file_name, $keyword ) ) {
-					$score += 5;
-				}
-			}
-
-			if ( $score > $best_score ) {
-				$best_score    = $score;
-				$best_appendix = $appendix;
-			}
-		}
-
-		if ( empty( $best_appendix['id'] ) ) {
-			return [];
-		}
-
-		$appendix_id = (int) $best_appendix['id'];
-		$get_response = self::api_request( 'GET', '/apiAppendix/get', [ 'id' => $appendix_id ] );
-		if ( is_wp_error( $get_response ) ) {
-			self::log_error( sprintf( 'Appendix detail fetch failed for ID %d: %s', $appendix_id, $get_response->get_error_message() ) );
-		}
-
-		$details  = is_wp_error( $get_response ) ? [] : self::extract_single_item( $get_response );
-		$file_name = isset( $best_appendix['name'] ) ? sanitize_text_field( (string) $best_appendix['name'] ) : '';
-		$url      = self::extract_appendix_url( $details, $appendix_id );
-
-		return [
-			'id'        => $appendix_id,
-			'file_name' => $file_name,
-			'url'       => $url,
-		];
-	}
-
-	/**
-	 * Extract appendix URL.
-	 *
-	 * @param array<string,mixed> $details Appendix details.
-	 * @param int                 $appendix_id Appendix ID.
-	 * @return string
-	 */
-	private static function extract_appendix_url( $details, $appendix_id ) {
-		$url_keys = [ 'url', 'downloadUrl', 'fileUrl', 'href' ];
-		foreach ( $url_keys as $key ) {
-			if ( ! empty( $details[ $key ] ) ) {
-				return esc_url_raw( (string) $details[ $key ] );
-			}
-		}
-
-		return esc_url_raw( self::API_BASE . '/apiAppendix/get?id=' . $appendix_id );
 	}
 
 	/**
@@ -440,14 +538,17 @@ final class Flix_Asari_Plugin {
 	}
 
 	/**
-	 * Request helper for Asari API.
+	 * Request helper for Asari SITE API.
+	 *
+	 * Authorization:
+	 * Header "SiteAuth" => "userId:Token"
 	 *
 	 * @param string              $method HTTP method.
 	 * @param string              $endpoint Endpoint.
-	 * @param array<string,mixed> $query Query args.
+	 * @param array<string,mixed> $data Data (dla POST leci jako JSON body).
 	 * @return array<string,mixed>|WP_Error
 	 */
-	private static function api_request( $method, $endpoint, $query = [] ) {
+	private static function api_request( $method, $endpoint, $data = [] ) {
 		$token = self::load_api_token();
 
 		if ( '' === $token ) {
@@ -455,26 +556,33 @@ final class Flix_Asari_Plugin {
 		}
 
 		$url = self::API_BASE . $endpoint;
-		if ( ! empty( $query ) ) {
-			$url = add_query_arg( $query, $url );
-		}
 
 		$attempts = 0;
 		$backoff  = [ 3, 6, 12 ];
 
 		do {
 			self::throttle();
-			$response = wp_remote_request(
-				$url,
-				[
-					'method'  => strtoupper( $method ),
-					'headers' => [
-						'Authorization' => 'Bearer ' . $token,
-						'Accept'        => 'application/json',
-					],
-					'timeout' => 30,
-				]
-			);
+
+			$args = [
+				'method'  => strtoupper( $method ),
+				'headers' => [
+					'SiteAuth' => self::SITE_USER_ID . ':' . $token,
+					'Accept'   => 'application/json',
+				],
+				'timeout' => 30,
+			];
+
+			if ( 'GET' === strtoupper( $method ) ) {
+				if ( ! empty( $data ) ) {
+					$url = add_query_arg( $data, $url );
+				}
+			} else {
+				// SITE API oczekuje form-data / x-www-form-urlencoded, nie JSON
+				$args['body'] = $data;
+				$args['headers']['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
+			}
+
+			$response = wp_remote_request( $url, $args );
 
 			if ( is_wp_error( $response ) ) {
 				self::log_error( sprintf( 'HTTP request error on %s: %s', $endpoint, $response->get_error_message() ) );
@@ -483,6 +591,15 @@ final class Flix_Asari_Plugin {
 
 			$code = (int) wp_remote_retrieve_response_code( $response );
 			$body = (string) wp_remote_retrieve_body( $response );
+
+
+			self::log_error( '--- API DEBUG START ---' );
+			self::log_error( 'URL: ' . $url );
+			self::log_error( 'METHOD: ' . strtoupper( $method ) );
+			self::log_error( 'HTTP: ' . $code );
+			self::log_error( 'BODY_LEN: ' . strlen( $body ) );
+			self::log_error( 'BODY: ' . self::truncate_for_log( $body ) );
+			self::log_error( '--- API DEBUG END ---' );
 
 			if ( 429 === $code ) {
 				if ( $attempts >= 3 ) {
@@ -550,11 +667,18 @@ final class Flix_Asari_Plugin {
 			return trim( (string) ASARI_API_TOKEN );
 		}
 
-		$token_file = trailingslashit( WP_CONTENT_DIR ) . 'flixcity-secrets/asari-token.php';
+		$token_file = trailingslashit( WP_CONTENT_DIR ) . 'as/as.php';
 		if ( file_exists( $token_file ) && is_readable( $token_file ) ) {
 			$token = require $token_file;
-			if ( is_string( $token ) && '' !== trim( $token ) ) {
-				return trim( $token );
+
+			if ( is_string( $token ) ) {
+				$token = preg_replace( '/^\xEF\xBB\xBF/', '', $token ); // BOM
+				$token = str_replace( [ "\r", "\n" ], '', $token );
+				$token = trim( $token );
+
+				if ( '' !== $token ) {
+					return $token;
+				}
 			}
 		}
 
@@ -562,12 +686,12 @@ final class Flix_Asari_Plugin {
 	}
 
 	/**
-	 * Extract list payload.
+	 * Extract exported id list from /exportedListingIdList response.
 	 *
 	 * @param array<string,mixed> $response API response.
 	 * @return array<int,array<string,mixed>>
 	 */
-	private static function extract_listings( $response ) {
+	private static function extract_exported_id_list( $response ) {
 		if ( isset( $response['data'] ) && is_array( $response['data'] ) ) {
 			if ( isset( $response['data']['items'] ) && is_array( $response['data']['items'] ) ) {
 				return array_values( array_filter( $response['data']['items'], 'is_array' ) );
@@ -587,17 +711,17 @@ final class Flix_Asari_Plugin {
 	}
 
 	/**
-	 * Extract single item payload.
+	 * Extract Listing object from /listing response.
 	 *
 	 * @param array<string,mixed> $response API response.
 	 * @return array<string,mixed>
 	 */
-	private static function extract_single_item( $response ) {
+	private static function extract_listing_object( $response ) {
 		if ( isset( $response['data'] ) && is_array( $response['data'] ) ) {
 			return $response['data'];
 		}
 
-		return $response;
+		return is_array( $response ) ? $response : [];
 	}
 
 	/**
@@ -654,22 +778,6 @@ final class Flix_Asari_Plugin {
 		);
 
 		add_settings_field(
-			'section',
-			'Section',
-			[ __CLASS__, 'render_section_field' ],
-			'flix-asari',
-			'flix_asari_main_section'
-		);
-
-		add_settings_field(
-			'status',
-			'Status',
-			[ __CLASS__, 'render_status_field' ],
-			'flix-asari',
-			'flix_asari_main_section'
-		);
-
-		add_settings_field(
 			'cron_enabled',
 			'Enable 10-min Cron Sync',
 			[ __CLASS__, 'render_cron_enabled_field' ],
@@ -686,8 +794,6 @@ final class Flix_Asari_Plugin {
 	 */
 	public static function sanitize_settings( $input ) {
 		$sanitized                 = [];
-		$sanitized['section']      = isset( $input['section'] ) ? sanitize_text_field( (string) $input['section'] ) : '';
-		$sanitized['status']       = isset( $input['status'] ) ? sanitize_text_field( (string) $input['status'] ) : 'Active';
 		$sanitized['cron_enabled'] = ! empty( $input['cron_enabled'] ) ? 1 : 0;
 
 		self::maybe_schedule_cron();
@@ -719,6 +825,7 @@ final class Flix_Asari_Plugin {
 						?>
 					</p>
 				</div>
+
 			<?php endif; ?>
 
 			<form method="post" action="options.php">
@@ -734,30 +841,15 @@ final class Flix_Asari_Plugin {
 				<input type="hidden" name="action" value="flix_asari_test_connection" />
 				<?php submit_button( __( 'Test connection', 'flix-asari' ), 'secondary', 'submit', false ); ?>
 			</form>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:10px;">
+				<?php wp_nonce_field( 'flix_asari_run_sync_now', 'flix_asari_run_sync_now_nonce' ); ?>
+				<input type="hidden" name="action" value="flix_asari_run_sync_now" />
+				<?php submit_button( __( 'Run sync now', 'flix-asari' ), 'primary', 'submit', false ); ?>
+			</form>
+
 		</div>
 		<?php
-	}
-
-	/**
-	 * Render section field.
-	 *
-	 * @return void
-	 */
-	public static function render_section_field() {
-		$settings = self::get_settings();
-		$value    = isset( $settings['section'] ) ? (string) $settings['section'] : '';
-		echo '<input type="text" name="' . esc_attr( self::OPTION_SETTINGS ) . '[section]" value="' . esc_attr( $value ) . '" class="regular-text" />';
-	}
-
-	/**
-	 * Render status field.
-	 *
-	 * @return void
-	 */
-	public static function render_status_field() {
-		$settings = self::get_settings();
-		$value    = isset( $settings['status'] ) ? (string) $settings['status'] : 'Active';
-		echo '<input type="text" name="' . esc_attr( self::OPTION_SETTINGS ) . '[status]" value="' . esc_attr( $value ) . '" class="regular-text" />';
 	}
 
 	/**
@@ -784,10 +876,11 @@ final class Flix_Asari_Plugin {
 		check_admin_referer( 'flix_asari_test_connection', 'flix_asari_test_nonce' );
 
 		$response = self::api_request(
-			'GET',
-			'/apiListing/list',
+			'POST',
+			'/exportedListingIdList',
 			[
-				'limit' => 1,
+				'closedDays'  => 0,
+				'blockedDays' => 0,
 			]
 		);
 
@@ -810,8 +903,6 @@ final class Flix_Asari_Plugin {
 		return wp_parse_args(
 			$settings,
 			[
-				'section'      => '',
-				'status'       => 'Active',
 				'cron_enabled' => 0,
 			]
 		);
