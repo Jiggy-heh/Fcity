@@ -625,3 +625,58 @@
 		display: none !important;
 	}
 }
+
+
+/* =========================================================
+   AVAILABILITY BADGE (Dostępny / Sprzedany / Rezerwacja)
+   ========================================================= */
+
+.houses__availability {
+	display: inline-flex;
+	align-items: flex-end;
+	justify-content: center;
+
+	gap: 8px;
+	padding: 4px 12px;
+
+	border-radius: 999px;
+	border: 1px solid transparent;
+
+	font-family: "Jost", sans-serif;
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 1;
+
+	vertical-align: baseline;
+	position: relative;
+	top: -1px;
+}
+
+.houses__availability::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 999px;
+	background: currentColor;
+	opacity: 0.9;
+	position: relative;
+	top: -4px;
+}
+
+.houses__availability.is-available {
+	color: #14804A;
+	background: rgba(20, 128, 74, 0.10);
+	border-color: rgba(20, 128, 74, 0.25);
+}
+
+.houses__availability.is-sold {
+	color: #B42318;
+	background: rgba(180, 35, 24, 0.10);
+	border-color: rgba(180, 35, 24, 0.25);
+}
+
+.houses__availability.is-reserved {
+	color: #B54708;
+	background: rgba(181, 71, 8, 0.10);
+	border-color: rgba(181, 71, 8, 0.25);
+}

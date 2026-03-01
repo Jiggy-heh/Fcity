@@ -37,6 +37,8 @@ final class Flix_Asari_Plugin {
 		add_action( 'admin_menu', [ __CLASS__, 'register_admin_page' ] );
 		add_action( 'admin_init', [ __CLASS__, 'register_settings' ] );
 		add_action( 'admin_post_flix_asari_test_connection', [ __CLASS__, 'handle_test_connection' ] );
+		add_action( 'add_meta_boxes', [ __CLASS__, 'register_house_metabox' ] );
+		add_action( 'save_post_fc_house', [ __CLASS__, 'save_house_metabox' ] );
 		register_activation_hook( __FILE__, [ __CLASS__, 'on_activation' ] );
 		register_deactivation_hook( __FILE__, [ __CLASS__, 'on_deactivation' ] );
 
@@ -50,6 +52,80 @@ final class Flix_Asari_Plugin {
 	 *
 	 * @return void
 	 */
+
+
+	public static function register_house_metabox() {
+		add_meta_box(
+			'flix_asari_house_map',
+			'Dane domu (mapowanie mapy)',
+			[ __CLASS__, 'render_house_metabox' ],
+			'fc_house',
+			'side',
+			'high'
+		);
+	}
+
+	public static function render_house_metabox( $post ) {
+		$house_number   = (string) get_post_meta( $post->ID, 'house_number', true );
+		$asari_id       = (string) get_post_meta( $post->ID, 'asari_id', true );
+		$availability   = (string) get_post_meta( $post->ID, 'asari_availability', true );
+		$appendix_id    = (string) get_post_meta( $post->ID, 'asari_card_appendix_id', true );
+
+		wp_nonce_field( 'flix_asari_house_metabox', 'flix_asari_house_metabox_nonce' );
+		?>
+		<p style="margin: 0 0 8px;">
+			<label for="flix_house_number"><strong>Numer domu (1–8 z mapy)</strong></label>
+			<input
+				type="text"
+				id="flix_house_number"
+				name="flix_house_number"
+				value="<?php echo esc_attr( $house_number ); ?>"
+				style="width: 100%;"
+				placeholder="np. 6"
+			/>
+		</p>
+
+		<hr style="margin: 10px 0;" />
+
+		<p style="margin: 0 0 6px;">
+			<strong>ASARI ID:</strong>
+			<span><?php echo esc_html( $asari_id ? $asari_id : '—' ); ?></span>
+		</p>
+
+		<p style="margin: 0 0 6px;">
+			<strong>Dostępność (customField_33480):</strong>
+			<span><?php echo esc_html( $availability ? $availability : '—' ); ?></span>
+		</p>
+
+		<p style="margin: 0;">
+			<strong>PDF appendix id:</strong>
+			<span><?php echo esc_html( $appendix_id ? $appendix_id : '—' ); ?></span>
+		</p>
+		<?php
+	}
+
+	public static function save_house_metabox( $post_id ) {
+		if ( ! isset( $_POST['flix_asari_house_metabox_nonce'] ) ) {
+			return;
+		}
+
+		if ( ! wp_verify_nonce( sanitize_text_field( (string) $_POST['flix_asari_house_metabox_nonce'] ), 'flix_asari_house_metabox' ) ) {
+			return;
+		}
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		if ( isset( $_POST['flix_house_number'] ) ) {
+			$value = sanitize_text_field( (string) $_POST['flix_house_number'] );
+			update_post_meta( $post_id, 'house_number', $value );
+		}
+	}
 
 	public static function handle_run_sync_now() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -105,6 +181,7 @@ final class Flix_Asari_Plugin {
 			'asari_price_currency'    => 'string',
 			'asari_total_area'        => 'number',
 			'asari_no_of_rooms'       => 'integer',
+			'asari_plot_area'         => 'number',
 
 			'asari_card_appendix_id'  => 'integer',
 			'asari_card_file_name'    => 'string',
@@ -483,13 +560,118 @@ final class Flix_Asari_Plugin {
 			update_post_meta( $post_id, 'asari_card_appendix_id', $appendix_id );
 		}
 
+		$image_id = self::extract_listing_image_id( $listing );
+		if ( $image_id > 0 ) {
+			update_post_meta( $post_id, 'asari_image_id', $image_id );
+			$debug['image_id'] = (string) $image_id;
+		}
+
+		$plot_area = self::extract_plot_area( $listing );
+		if ( $plot_area > 0 ) {
+			update_post_meta( $post_id, 'asari_plot_area', (float) $plot_area );
+			$debug['plot_area'] = (string) $plot_area;
+		}
+
+
+
+		$debug['totalArea'] = isset( $listing['totalArea'] ) ? (string) $listing['totalArea'] : '—';
+		$debug['rooms_key_present'] = isset( $listing['noOfRoomS'] ) ? 'noOfRoomS' : ( isset( $listing['noOfRooms'] ) ? 'noOfRooms' : '—' );
+		$debug['availability_extracted'] = (string) $availability_id;
+		$debug['appendix_id'] = (string) $appendix_id;
+
+		$debug['has_customField_33480'] = isset( $listing['customField_33480'] ) ? 'yes' : 'no';
+		$debug['has_customFields'] = isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ? 'yes' : 'no';
+		$debug['customFields_count'] = isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ? (string) count( $listing['customFields'] ) : '0';
 		self::log_error( 'Listing synced: ' . self::truncate_for_log( wp_json_encode( $debug ) ) );
+
 
 		return [
 			'post_id'  => (int) $post_id,
 			'asari_id' => $asari_id,
 		];
 	}
+
+
+	/**
+	 * Try to extract first image id from listing payload.
+	 *
+	 * @param array<string,mixed> $listing Listing payload.
+	 * @return int
+	 */
+	private static function extract_listing_image_id( $listing ) {
+		$candidates = [
+			'imageId',
+			'mainImageId',
+			'thumbnailId',
+		];
+
+		foreach ( $candidates as $key ) {
+			if ( isset( $listing[ $key ] ) && is_numeric( $listing[ $key ] ) ) {
+				return (int) $listing[ $key ];
+			}
+		}
+
+		// Common patterns: images => [{id:...}], imageIds => [..]
+		if ( isset( $listing['images'] ) && is_array( $listing['images'] ) ) {
+			foreach ( $listing['images'] as $img ) {
+				if ( is_array( $img ) && isset( $img['id'] ) && is_numeric( $img['id'] ) ) {
+					return (int) $img['id'];
+				}
+			}
+		}
+
+		if ( isset( $listing['imageIds'] ) && is_array( $listing['imageIds'] ) ) {
+			foreach ( $listing['imageIds'] as $id ) {
+				if ( is_numeric( $id ) ) {
+					return (int) $id;
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Extract plot area from customField_33573 (numeric).
+	 *
+	 * @param array<string,mixed> $listing Listing payload.
+	 * @return float
+	 */
+	private static function extract_plot_area( $listing ) {
+		$key = 'customField_33573';
+
+		if ( isset( $listing[ $key ] ) ) {
+			$field = $listing[ $key ];
+			if ( is_numeric( $field ) ) {
+				return (float) $field;
+			}
+			if ( is_array( $field ) ) {
+				if ( isset( $field['value'] ) && is_numeric( $field['value'] ) ) {
+					return (float) $field['value'];
+				}
+			}
+		}
+
+		// Fallback: if they ever return customFields array
+		if ( isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ) {
+			foreach ( $listing['customFields'] as $field ) {
+				if ( ! is_array( $field ) ) {
+					continue;
+				}
+				$field_id = isset( $field['id'] ) ? (int) $field['id'] : 0;
+				if ( 33573 !== $field_id ) {
+					continue;
+				}
+
+				if ( isset( $field['value'] ) && is_numeric( $field['value'] ) ) {
+					return (float) $field['value'];
+				}
+			}
+		}
+
+		return 0.0;
+	}
+
 
 	/**
 	 * REST endpoint: return houses list for front-end map.
@@ -532,9 +714,10 @@ final class Flix_Asari_Plugin {
 				'currency'  => (string) get_post_meta( $post_id, 'asari_price_currency', true ),
 				'area'      => (float) get_post_meta( $post_id, 'asari_total_area', true ),
 				'rooms'     => (int) get_post_meta( $post_id, 'asari_no_of_rooms', true ),
+				'plot'      => (float) get_post_meta( $post_id, 'asari_plot_area', true ),
 				'plan_url'  => $plan_url,
 				'dims_url'  => (string) get_post_meta( $post_id, 'dims_url', true ),
-				'model_img' => wp_get_attachment_image_url( (int) get_post_meta( $post_id, 'model_img', true ), 'full' ),
+				'model_img' => self::build_asari_image_url( (int) get_post_meta( $post_id, 'asari_image_id', true ) ),
 			];
 		}
 
@@ -545,6 +728,22 @@ final class Flix_Asari_Plugin {
 			],
 			200
 		);
+	}
+
+
+
+	/**
+	 * Build public ASARI image URL.
+	 *
+	 * @param int $image_id Image ID.
+	 * @return string
+	 */
+	private static function build_asari_image_url( $image_id ) {
+		if ( $image_id <= 0 ) {
+			return '';
+		}
+
+		return 'https://img.asariweb.pl/normal/' . (int) $image_id;
 	}
 
 	/**
@@ -564,7 +763,7 @@ final class Flix_Asari_Plugin {
 		if ( '' === $token ) {
 			return new WP_REST_Response( [ 'success' => false, 'message' => 'Missing ASARI token.' ], 500 );
 		}
-
+		self::throttle();
 		$response = wp_remote_get(
 			add_query_arg( [ 'id' => $appendix_id ], self::API_APPENDIX_BASE . '/get' ),
 			[
@@ -690,6 +889,7 @@ final class Flix_Asari_Plugin {
 			],
 			self::API_APPENDIX_BASE . '/list'
 		);
+		self::throttle();
 		$response = wp_remote_get(
 			$url,
 			[
