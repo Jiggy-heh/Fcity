@@ -35,6 +35,7 @@
 		const fieldArea = root.querySelector('[data-house-area]');
 		const fieldPlot = root.querySelector('[data-house-plot]');
 		const fieldRooms = root.querySelector('[data-house-rooms]');
+		const fieldStatus = root.querySelector('[data-house-status]');
 		const linkPlan = root.querySelector('[data-house-plan]');
 		const linkDims = root.querySelector('[data-house-dims]');
 		const modelImg = root.querySelector('[data-house-model]');
@@ -60,21 +61,22 @@
 			}
 		};
 
-		const getVisibleShapes = () => {
-			return Array.from(root.querySelectorAll('.houses__shape')).filter((el) => {
-				const svg = el.closest('svg');
-				return svg && svg.offsetParent !== null;
-			});
+		const getShapes = () => {
+			return Array.from(root.querySelectorAll('.houses__shape'));
 		};
 
-		let shapes = getVisibleShapes();
+		let shapes = getShapes();
 
 		if (!shapes.length) {
+			const tries = Number(root.dataset.housesTries || '0');
+			if (tries < 30) {
+				root.dataset.housesTries = String(tries + 1);
+				setTimeout(() => initHouses(root), 100);
+			}
 			return;
 		}
-
 		const bindShapes = () => {
-			shapes = getVisibleShapes();
+			shapes = getShapes();
 
 			shapes.forEach((shape) => {
 				if (shape.dataset.bound === '1') return;
@@ -108,14 +110,20 @@
 				shape.addEventListener('click', (event) => {
 					event.preventDefault();
 
-					getVisibleShapes().forEach((item) => item.classList.remove('is-active'));
+					getShapes().forEach((item) => item.classList.remove('is-active'));
 					shape.classList.add('is-active');
 
 
 					fieldPrice.textContent = formatPrice(data.price, data.currency);
 					fieldArea.textContent = formatArea(data.area);
-					if (fieldRooms) fieldRooms.textContent = data.rooms ? String(data.rooms) : '—';
-					if (fieldPlot) fieldPlot.textContent = '—';
+					if (fieldStatus) {
+						fieldStatus.textContent = statusLabel[data.status] || '—';
+						fieldStatus.classList.remove('is-available', 'is-sold', 'is-reserved');
+						fieldStatus.classList.add(`is-${data.status}`);
+					}
+					
+					if (fieldRooms) fieldRooms.textContent = (data.rooms || data.rooms === 0) ? String(data.rooms) : '—';
+					if (fieldPlot) fieldPlot.textContent = formatArea(data.plot);
 					if (linkPlan && data.plan_url) {
 						linkPlan.href = data.plan_url;
 						linkPlan.target = '_blank';
@@ -126,8 +134,14 @@
 						linkDims.target = '_blank';
 						linkDims.rel = 'noopener';
 					}
-					if (modelImg && data.model_img) {
-						modelImg.src = data.model_img;
+					if (modelImg) {
+						if (data.model_img) {
+							modelImg.src = data.model_img;
+							modelImg.removeAttribute('hidden');
+						} else {
+							modelImg.removeAttribute('src');
+							modelImg.setAttribute('hidden', 'hidden');
+						}
 					}
 
 					setStep(root, 3);
@@ -144,8 +158,10 @@
 			});
 		};
 
-		fetchHouses().then(bindShapes);
-
+		fetchHouses().then(() => {
+			bindShapes();
+			setTimeout(bindShapes, 150);
+		});
 		const activateStepTwo = () => {
 			if (root.classList.contains('is-step-1')) {
 				setStep(root, 2);
@@ -314,5 +330,24 @@
 
 
 
-	document.querySelectorAll('.houses').forEach(initHouses);
+	const boot = () => {
+		document.querySelectorAll('.houses').forEach(initHouses);
+	};
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', boot);
+	} else {
+		boot();
+	}
+
+	// Fallback: jeśli sekcja .houses jest dogrywana po czasie (cache/Elementor/animacje)
+	const observer = new MutationObserver(() => {
+		const found = document.querySelector('.houses');
+		if (found) {
+			boot();
+			observer.disconnect();
+		}
+	});
+
+	observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
