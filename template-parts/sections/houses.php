@@ -173,6 +173,10 @@ if ( empty( $materials_title ) ) {
 						<div class="houses__stat"><span class="houses__stat-label">Cena:</span> <span class="houses__stat-value" data-house-price>—</span></div>
 						<div class="houses__stat"><span class="houses__stat-label">Powierzchnia:</span> <span class="houses__stat-value" data-house-area>—</span></div>
 						<div class="houses__stat"><span class="houses__stat-label">Liczba pokoi:</span> <span class="houses__stat-value" data-house-rooms>—</span></div>
+						<div class="houses__stat">
+							<span class="houses__stat-label">Dostępność:</span>
+							<span class="houses__stat-value houses__availability" data-house-status>—</span>
+						</div>
 						<div class="houses__stat"><span class="houses__stat-label">Działka:</span> <span class="houses__stat-value" data-house-plot>—</span></div>
 					</div>
 					<div class="houses__actions">

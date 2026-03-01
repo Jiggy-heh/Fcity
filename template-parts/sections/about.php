@@ -101,7 +101,7 @@ if ( is_string( $button_url ) && trim( $button_url ) !== '' ) {
 				<?php endif; ?>
 
 				<?php if ( ! empty( $title_right ) ) : ?>
-					<h2 class="section-title"><?php echo esc_html( $title_right ); ?></h2>
+					<h2 class="section-title"><?php echo esc_html( flix_normalize_text( $title_right ) ); ?></h2>
 				<?php endif; ?>
 
 				<?php if ( ! empty( $desc_right ) ) : ?>
