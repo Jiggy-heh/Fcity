@@ -110,7 +110,6 @@
 }
 
 .houses__shape.is-available { fill: rgba(79, 186, 114, 0.45); }
-.houses__shape.is-reserved  { fill: rgba(238, 179, 92, 0.45); }
 .houses__shape.is-sold      { fill: rgba(224, 77, 77, 0.45); }
 
 .houses__shape.is-active {
@@ -120,7 +119,8 @@
 
 .houses.is-step-1 .houses__shape { pointer-events: none; }
 .houses.is-step-2 .houses__overlay,
-.houses.is-step-3 .houses__overlay { display: none; }
+.houses.is-step-3 .houses__overlay,
+.houses.is-step-4 .houses__overlay { display: none; }
 
 .houses__tooltip {
 	position: fixed;
@@ -144,6 +144,104 @@
 .houses__shape:focus,
 .houses__shape:focus-visible {
 	outline: none;
+}
+
+
+
+/* =========================================================
+   STEP 3 – WYBÓR STRONY LOKALU
+   ========================================================= */
+
+.houses__choose {
+	width: 100%;
+	max-width: 1360px;
+	background: var(--color-third);
+	padding: 0 35px 30px;
+	display: none;
+}
+
+.houses.is-step-3 .houses__choose,
+.houses.is-step-4 .houses__choose {
+	display: block;
+}
+
+.houses__choose-title {
+	margin: 0;
+	font-family: Jost, sans-serif;
+	font-weight: 700;
+	font-size: 34px;
+	line-height: 1.1;
+	color: var(--color-primary);
+}
+
+.houses__choose-grid {
+	margin-top: 24px;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 24px;
+}
+
+.houses__choose-card {
+	background: #fff;
+	border: 2px solid transparent;
+	border-radius: 8px;
+	padding: 14px;
+	cursor: pointer;
+	transition: border-color .2s ease, box-shadow .2s ease;
+	text-align: left;
+}
+
+.houses__choose-card:hover,
+.houses__choose-card.is-active {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px rgba(55, 32, 94, 0.12);
+}
+
+.houses__choose-image-wrap {
+	display: block;
+	aspect-ratio: 16 / 10;
+	background: #f0f0f0;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.houses__choose-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.houses__choose-area {
+	display: block;
+	margin-top: 12px;
+	font-family: Jost, sans-serif;
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 1.2;
+	color: var(--color-primary);
+}
+
+.houses__choose-buttons {
+	margin-top: 20px;
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.houses__choose-buttons .btn.is-active {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 2px;
+}
+
+@media (max-width: 991px) {
+	.houses__choose {
+		padding: 0 var(--container-pad) 24px;
+	}
+
+	.houses__choose-grid {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
 }
 
 /* =========================================================
@@ -628,12 +726,12 @@
 
 
 /* =========================================================
-   AVAILABILITY BADGE (Dostępny / Sprzedany / Rezerwacja)
+   AVAILABILITY BADGE (Dostępny / Sprzedany)
    ========================================================= */
 
 .houses__availability {
 	display: inline-flex;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: center;
 
 	gap: 8px;
@@ -645,11 +743,11 @@
 	font-family: "Jost", sans-serif;
 	font-weight: 600;
 	font-size: 18px;
-	line-height: 1;
+	line-height: 1.1;
 
 	vertical-align: baseline;
 	position: relative;
-	top: -1px;
+	top: 0;
 }
 
 .houses__availability::before {
@@ -660,7 +758,7 @@
 	background: currentColor;
 	opacity: 0.9;
 	position: relative;
-	top: -4px;
+	top: 0;
 }
 
 .houses__availability.is-available {
@@ -673,10 +771,4 @@
 	color: #B42318;
 	background: rgba(180, 35, 24, 0.10);
 	border-color: rgba(180, 35, 24, 0.25);
-}
-
-.houses__availability.is-reserved {
-	color: #B54708;
-	background: rgba(181, 71, 8, 0.10);
-	border-color: rgba(181, 71, 8, 0.25);
 }

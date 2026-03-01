@@ -34,6 +34,39 @@ $image      = $get_acf( 'house_img' );
 $materials_label = $get_acf( 'house_materials_label' );
 $materials_title = $get_acf( 'house_materials_title' );
 $materials       = $get_acf( 'house_materials' );
+$buildings_cards = $get_acf( 'house_buildings_cards' );
+$cards_map       = [];
+
+if ( ! empty( $buildings_cards ) && is_array( $buildings_cards ) ) {
+	foreach ( $buildings_cards as $row ) {
+		$building_number = isset( $row['building_number'] ) ? (string) $row['building_number'] : '';
+		if ( '' === $building_number ) {
+			continue;
+		}
+
+		$left_image  = $row['left_card_image'] ?? null;
+		$right_image = $row['right_card_image'] ?? null;
+
+		$left_image_url = '';
+		if ( is_array( $left_image ) && ! empty( $left_image['url'] ) ) {
+			$left_image_url = (string) $left_image['url'];
+		} elseif ( is_numeric( $left_image ) ) {
+			$left_image_url = (string) wp_get_attachment_image_url( (int) $left_image, 'large' );
+		}
+
+		$right_image_url = '';
+		if ( is_array( $right_image ) && ! empty( $right_image['url'] ) ) {
+			$right_image_url = (string) $right_image['url'];
+		} elseif ( is_numeric( $right_image ) ) {
+			$right_image_url = (string) wp_get_attachment_image_url( (int) $right_image, 'large' );
+		}
+
+		$cards_map[ $building_number ] = [
+			'left'  => $left_image_url,
+			'right' => $right_image_url,
+		];
+	}
+}
 
 if ( empty( $section_id ) ) {
 	$section_id = 'wybierz-dom';
@@ -66,7 +99,7 @@ if ( empty( $materials_title ) ) {
 	$materials_title = 'Pobierz materiały';
 }
 ?>
-<section class="section houses is-step-1" id="<?php echo esc_attr( $section_id ); ?>" data-houses-endpoint="<?php echo esc_url( rest_url( 'flix-asari/v1/houses' ) ); ?>">
+<section class="section houses is-step-1" id="<?php echo esc_attr( $section_id ); ?>" data-houses-endpoint="<?php echo esc_url( rest_url( 'flix-asari/v1/houses' ) ); ?>" data-houses-cards="<?php echo esc_attr( wp_json_encode( $cards_map ) ); ?>">
 	<div class="container houses__inner">
 		<div class="houses__head">
 			<div class="houses__head-left">
@@ -165,6 +198,35 @@ if ( empty( $materials_title ) ) {
 			</div>
 		</div>
 
+
+		<div class="houses__choose" data-houses-choose>
+			<h3 class="houses__choose-title">Wybierz stronę lokalu</h3>
+			<div class="houses__choose-grid">
+				<button type="button" class="houses__choose-card" data-house-side-card="left">
+					<span class="houses__choose-image-wrap">
+						<img class="houses__choose-image" src="" alt="Lokal lewy" data-house-side-image="left">
+					</span>
+					<span class="houses__choose-area" data-house-side-area="left">Powierzchnia: —</span>
+				</button>
+				<button type="button" class="houses__choose-card" data-house-side-card="right">
+					<span class="houses__choose-image-wrap">
+						<img class="houses__choose-image" src="" alt="Lokal prawy" data-house-side-image="right">
+					</span>
+					<span class="houses__choose-area" data-house-side-area="right">Powierzchnia: —</span>
+				</button>
+			</div>
+			<div class="houses__choose-buttons">
+				<button type="button" class="btn btn--outline" data-house-side-button="left">
+					<span class="btn__text">Wybierz lokal lewy</span>
+					<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
+				</button>
+				<button type="button" class="btn btn--outline" data-house-side-button="right">
+					<span class="btn__text">Wybierz lokal prawy</span>
+					<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
+				</button>
+			</div>
+		</div>
+
 		<div class="houses__expanded" data-houses-expanded>
 			<div class="houses__expanded-grid">
 				<div class="houses__expanded-left">
@@ -182,10 +244,6 @@ if ( empty( $materials_title ) ) {
 					<div class="houses__actions">
 						<a class="btn btn--outline" href="#" data-house-plan>
 							<span class="btn__text">Pobierz rzut nieruchomości</span>
-							<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
-						</a>
-						<a class="btn btn--outline" href="#" data-house-dims>
-							<span class="btn__text">Pobierz tabelę wymiarów</span>
 							<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
 						</a>
 					</div>

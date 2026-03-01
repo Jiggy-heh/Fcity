@@ -67,6 +67,7 @@ final class Flix_Asari_Plugin {
 
 	public static function render_house_metabox( $post ) {
 		$house_number   = (string) get_post_meta( $post->ID, 'house_number', true );
+		$unit_side      = (string) get_post_meta( $post->ID, 'unit_side', true );
 		$asari_id       = (string) get_post_meta( $post->ID, 'asari_id', true );
 		$availability   = (string) get_post_meta( $post->ID, 'asari_availability', true );
 		$appendix_id    = (string) get_post_meta( $post->ID, 'asari_card_appendix_id', true );
@@ -83,6 +84,15 @@ final class Flix_Asari_Plugin {
 				style="width: 100%;"
 				placeholder="np. 6"
 			/>
+		</p>
+
+		<p style="margin: 0 0 8px;">
+			<label for="flix_unit_side"><strong>Strona lokalu</strong></label>
+			<select id="flix_unit_side" name="flix_unit_side" style="width: 100%;">
+				<option value="">— Wybierz —</option>
+				<option value="left" <?php selected( $unit_side, 'left' ); ?>>left</option>
+				<option value="right" <?php selected( $unit_side, 'right' ); ?>>right</option>
+			</select>
 		</p>
 
 		<hr style="margin: 10px 0;" />
@@ -124,6 +134,15 @@ final class Flix_Asari_Plugin {
 		if ( isset( $_POST['flix_house_number'] ) ) {
 			$value = sanitize_text_field( (string) $_POST['flix_house_number'] );
 			update_post_meta( $post_id, 'house_number', $value );
+		}
+
+		if ( isset( $_POST['flix_unit_side'] ) ) {
+			$unit_side = sanitize_key( (string) $_POST['flix_unit_side'] );
+			if ( in_array( $unit_side, [ 'left', 'right' ], true ) ) {
+				update_post_meta( $post_id, 'unit_side', $unit_side );
+			} else {
+				delete_post_meta( $post_id, 'unit_side' );
+			}
 		}
 	}
 
@@ -170,6 +189,7 @@ final class Flix_Asari_Plugin {
 			'asari_last_updated'       => 'integer',
 
 			'house_number'            => 'string',
+			'unit_side'               => 'string',
 			'status_override'         => 'string',
 			'plan_url'                => 'string',
 			'dims_url'                => 'string',
@@ -497,6 +517,9 @@ final class Flix_Asari_Plugin {
 			$name = sanitize_text_field( (string) $listing['name'] );
 		}
 
+		$title_from_custom = self::extract_custom_field_text( $listing, 33582 );
+		$post_title        = '' !== $title_from_custom ? $title_from_custom : ( '' !== $name ? $name : sprintf( 'Listing %d', $asari_id ) );
+
 		$post_id = self::find_house_by_asari_id( $asari_id );
 
 		if ( ! $post_id ) {
@@ -504,7 +527,7 @@ final class Flix_Asari_Plugin {
 				[
 					'post_type'   => 'fc_house',
 					'post_status' => 'publish',
-					'post_title'  => '' !== $name ? $name : sprintf( 'Listing %d', $asari_id ),
+					'post_title'  => $post_title,
 				]
 			);
 
@@ -515,6 +538,13 @@ final class Flix_Asari_Plugin {
 			self::log_error( 'Created post_id=' . (int) $post_id . ' for asari_id=' . $asari_id );
 		} else {
 			self::log_error( 'Updating post_id=' . (int) $post_id . ' for asari_id=' . $asari_id );
+
+			wp_update_post(
+				[
+					'ID'         => (int) $post_id,
+					'post_title' => $post_title,
+				]
+			);
 		}
 
 		update_post_meta( $post_id, 'asari_id', $asari_id );
@@ -555,10 +585,7 @@ final class Flix_Asari_Plugin {
 			update_post_meta( $post_id, 'asari_availability', (string) $availability_id );
 		}
 
-		$appendix_id = self::fetch_listing_pdf_appendix_id( $asari_id );
-		if ( $appendix_id > 0 ) {
-			update_post_meta( $post_id, 'asari_card_appendix_id', $appendix_id );
-		}
+		$appendix_id = 0;
 
 		$image_id = self::extract_listing_image_id( $listing );
 		if ( $image_id > 0 ) {
@@ -582,6 +609,7 @@ final class Flix_Asari_Plugin {
 		$debug['has_customField_33480'] = isset( $listing['customField_33480'] ) ? 'yes' : 'no';
 		$debug['has_customFields'] = isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ? 'yes' : 'no';
 		$debug['customFields_count'] = isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ? (string) count( $listing['customFields'] ) : '0';
+		$debug['title_from_custom_33582'] = $title_from_custom;
 		self::log_error( 'Listing synced: ' . self::truncate_for_log( wp_json_encode( $debug ) ) );
 
 
@@ -672,6 +700,55 @@ final class Flix_Asari_Plugin {
 		return 0.0;
 	}
 
+	/**
+	 * Extract custom field text value.
+	 *
+	 * @param array<string,mixed> $listing Listing payload.
+	 * @param int                 $field_id Custom field ID.
+	 * @return string
+	 */
+	private static function extract_custom_field_text( $listing, $field_id ) {
+		$key = 'customField_' . (int) $field_id;
+
+		if ( isset( $listing[ $key ] ) ) {
+			$field = $listing[ $key ];
+			if ( is_scalar( $field ) ) {
+				return sanitize_text_field( (string) $field );
+			}
+
+			if ( is_array( $field ) ) {
+				$sub_keys = [ 'value', 'text', 'name', 'label' ];
+				foreach ( $sub_keys as $sub_key ) {
+					if ( isset( $field[ $sub_key ] ) && is_scalar( $field[ $sub_key ] ) ) {
+						return sanitize_text_field( (string) $field[ $sub_key ] );
+					}
+				}
+			}
+		}
+
+		if ( isset( $listing['customFields'] ) && is_array( $listing['customFields'] ) ) {
+			foreach ( $listing['customFields'] as $field ) {
+				if ( ! is_array( $field ) ) {
+					continue;
+				}
+
+				$current_id = isset( $field['id'] ) ? (int) $field['id'] : 0;
+				if ( $current_id !== (int) $field_id ) {
+					continue;
+				}
+
+				$sub_keys = [ 'value', 'text', 'name', 'label' ];
+				foreach ( $sub_keys as $sub_key ) {
+					if ( isset( $field[ $sub_key ] ) && is_scalar( $field[ $sub_key ] ) ) {
+						return sanitize_text_field( (string) $field[ $sub_key ] );
+					}
+				}
+			}
+		}
+
+		return '';
+	}
+
 
 	/**
 	 * REST endpoint: return houses list for front-end map.
@@ -690,26 +767,30 @@ final class Flix_Asari_Plugin {
 			]
 		);
 
-		$data = [];
+		$data      = [];
+		$buildings = [];
 
 		foreach ( $posts as $post ) {
 			$post_id = (int) $post->ID;
 			$number  = (string) get_post_meta( $post_id, 'house_number', true );
+			$unit_side = sanitize_key( (string) get_post_meta( $post_id, 'unit_side', true ) );
 
-			if ( '' === $number ) {
+			if ( '' === $number || ! in_array( $unit_side, [ 'left', 'right' ], true ) ) {
 				continue;
 			}
 
-			$appendix_id = (int) get_post_meta( $post_id, 'asari_card_appendix_id', true );
 			$plan_url    = (string) get_post_meta( $post_id, 'plan_url', true );
 
-			if ( $appendix_id > 0 ) {
-				$plan_url = rest_url( 'flix-asari/v1/appendix/' . $appendix_id );
+			$status = self::resolve_house_status( $post_id );
+			if ( ! isset( $buildings[ $number ] ) ) {
+				$buildings[ $number ] = [];
 			}
+			$buildings[ $number ][] = $status;
 
 			$data[] = [
 				'number'    => $number,
-				'status'    => self::resolve_house_status( $post_id ),
+				'unit_side' => $unit_side,
+				'status'    => $status,
 				'price'     => (float) get_post_meta( $post_id, 'asari_price_amount', true ),
 				'currency'  => (string) get_post_meta( $post_id, 'asari_price_currency', true ),
 				'area'      => (float) get_post_meta( $post_id, 'asari_total_area', true ),
@@ -721,10 +802,28 @@ final class Flix_Asari_Plugin {
 			];
 		}
 
+		$buildings_data = [];
+		for ( $house_index = 1; $house_index <= 8; $house_index++ ) {
+			$house_number = (string) $house_index;
+			$statuses     = isset( $buildings[ $house_number ] ) ? $buildings[ $house_number ] : [];
+
+			if ( empty( $statuses ) ) {
+				continue;
+			}
+
+			$building_status = in_array( 'available', $statuses, true ) ? 'available' : 'sold';
+
+			$buildings_data[] = [
+				'building_number' => $house_number,
+				'status'          => $building_status,
+			];
+		}
+
 		return new WP_REST_Response(
 			[
 				'success' => true,
 				'data'    => $data,
+				'buildings' => $buildings_data,
 			],
 			200
 		);
@@ -806,7 +905,7 @@ final class Flix_Asari_Plugin {
 	private static function resolve_house_status( $post_id ) {
 		$override = sanitize_key( (string) get_post_meta( $post_id, 'status_override', true ) );
 
-		if ( in_array( $override, [ 'available', 'sold', 'reserved' ], true ) ) {
+		if ( in_array( $override, [ 'available', 'sold' ], true ) ) {
 			return $override;
 		}
 
