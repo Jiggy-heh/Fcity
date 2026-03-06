@@ -267,6 +267,38 @@ function flixcity_enqueue_assets() {
 		}
 	}
 
+	if ( is_front_page() ) {
+
+		$home_sections = [
+			'hero',
+			'about',
+			'features',
+			'contact',
+			'home-hero',
+			'home-investments',
+		];
+
+		foreach ( $home_sections as $section ) {
+			$path = "/assets/css/sections/{$section}.css";
+
+			if ( file_exists( get_template_directory() . $path ) ) {
+				wp_enqueue_style(
+					"flixcity-home-section-{$section}",
+					get_template_directory_uri() . $path,
+					[ 'flixcity-config' ],
+					'1.0.0'
+				);
+			}
+		}
+
+		wp_enqueue_style(
+			'flixcity-home-nav',
+			get_template_directory_uri() . '/assets/css/home-nav.css',
+			[ 'flixcity-config' ],
+			'1.0.0'
+		);
+	}
+
 	/* ===============================
 	   style.css — override LAST
 	   =============================== */
@@ -285,12 +317,20 @@ add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_assets' );
 require get_template_directory() . '/inc/post-types/inwestycje.php';
 require get_template_directory() . '/inc/acf/houses-layout.php';
 require get_template_directory() . '/inc/acf/finish-standard.php';
+require get_template_directory() . '/inc/acf/homepage.php';
 
 
 //* Scroll menu */
-function flixcity_enqueue_lp_scripts() {
+function flixcity_enqueue_nav_assets() {
 
 	if ( is_singular( 'inwestycje' ) ) {
+		wp_enqueue_style(
+			'flixcity-lp-nav',
+			get_template_directory_uri() . '/assets/css/lp-nav.css',
+			[ 'flixcity-style' ],
+			'1.0.0'
+		);
+
 		wp_enqueue_script(
 			'flixcity-lp-nav',
 			get_template_directory_uri() . '/assets/js/lp-nav.js',
@@ -299,8 +339,18 @@ function flixcity_enqueue_lp_scripts() {
 			true
 		);
 	}
+
+	if ( is_front_page() ) {
+		wp_enqueue_script(
+			'flixcity-home-nav',
+			get_template_directory_uri() . '/assets/js/home-nav.js',
+			[],
+			'1.0.0',
+			true
+		);
+	}
 }
-add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_lp_scripts' );
+add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_nav_assets', 30 );
 
 
 /**
@@ -316,22 +366,6 @@ function flixcity_allow_svg_uploads( $mimes ) {
 	return $mimes;
 }
 add_filter( 'upload_mimes', 'flixcity_allow_svg_uploads' );
-
-
-//* css nav */
-function flixcity_enqueue_lp_nav_css() {
-
-	if ( is_singular( 'inwestycje' ) ) {
-
-		wp_enqueue_style(
-			'flixcity-lp-nav',
-			get_template_directory_uri() . '/assets/css/lp-nav.css',
-			[ 'flixcity-style' ],
-			'1.0.0'
-		);
-	}
-}
-add_action( 'wp_enqueue_scripts', 'flixcity_enqueue_lp_nav_css', 30 );
 
 
 //* Section scripts (Gallery + FAQ) — poprawnie przez hook (bez luzem wp_enqueue_script)
