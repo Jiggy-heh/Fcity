@@ -86,7 +86,9 @@ if ( is_string( $button_url ) && trim( $button_url ) !== '' ) {
 			<div class="about__col about__col--media about__col--media-left">
 				<div class="about__media about__media--left">
 					<?php if ( $img_left_id ) : ?>
-						<?php echo wp_get_attachment_image( $img_left_id, 'full', false, [ 'class' => 'about__img about__img--left', 'alt' => '' ] ); ?>
+						<span class="about__img-wrap about__img-wrap--left" aria-hidden="true">
+							<?php echo wp_get_attachment_image( $img_left_id, 'full', false, [ 'class' => 'about__img about__img--left', 'alt' => '' ] ); ?>
+						</span>
 					<?php endif; ?>
 				</div>
 			</div>
@@ -140,7 +142,9 @@ if ( is_string( $button_url ) && trim( $button_url ) !== '' ) {
 			<div class="about__col about__col--media about__col--media-right">
 				<div class="about__media about__media--right">
 					<?php if ( $img_right_id ) : ?>
-						<?php echo wp_get_attachment_image( $img_right_id, 'full', false, [ 'class' => 'about__img about__img--right', 'alt' => '' ] ); ?>
+						<span class="about__img-wrap about__img-wrap--right" aria-hidden="true">
+							<?php echo wp_get_attachment_image( $img_right_id, 'full', false, [ 'class' => 'about__img about__img--right', 'alt' => '' ] ); ?>
+						</span>
 					<?php endif; ?>
 				</div>
 			</div>

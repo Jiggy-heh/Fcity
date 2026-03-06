@@ -198,39 +198,53 @@ if ( empty( $materials_title ) ) {
 			</div>
 		</div>
 
-
 		<div class="houses__choose" data-houses-choose>
 			<h3 class="houses__choose-title">Wybierz stronę lokalu</h3>
+
 			<div class="houses__choose-grid">
-				<button type="button" class="houses__choose-card" data-house-side-card="left">
+				<div class="houses__choose-card" data-house-side-card="left">
 					<span class="houses__choose-image-wrap">
 						<img class="houses__choose-image" src="" alt="Lokal lewy" data-house-side-image="left">
 					</span>
-					<span class="houses__choose-area" data-house-side-area="left">Powierzchnia: —</span>
-				</button>
-				<button type="button" class="houses__choose-card" data-house-side-card="right">
+
+					<span class="houses__choose-area">
+						<span data-house-side-label="left">Nr działki: —</span>
+						<span data-house-side-area="left">Powierzchnia: —</span>
+						<span class="houses__availability" data-house-side-status="left" hidden></span>
+					</span>
+
+					<div class="houses__choose-cta">
+						<button type="button" class="btn btn--outline" data-house-side-button="left">
+							<span class="btn__text">Wybierz lokal lewy</span>
+							<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
+
+				<div class="houses__choose-card" data-house-side-card="right">
 					<span class="houses__choose-image-wrap">
 						<img class="houses__choose-image" src="" alt="Lokal prawy" data-house-side-image="right">
 					</span>
-					<span class="houses__choose-area" data-house-side-area="right">Powierzchnia: —</span>
-				</button>
-			</div>
-			<div class="houses__choose-buttons">
-				<button type="button" class="btn btn--outline" data-house-side-button="left">
-					<span class="btn__text">Wybierz lokal lewy</span>
-					<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
-				</button>
-				<button type="button" class="btn btn--outline" data-house-side-button="right">
-					<span class="btn__text">Wybierz lokal prawy</span>
-					<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
-				</button>
+
+					<span class="houses__choose-area">
+						<span data-house-side-label="right">Nr działki: —</span>
+						<span data-house-side-area="right">Powierzchnia: —</span>
+						<span class="houses__availability" data-house-side-status="right" hidden></span>
+					</span>
+
+					<div class="houses__choose-cta">
+						<button type="button" class="btn btn--outline" data-house-side-button="right">
+							<span class="btn__text">Wybierz lokal prawy</span>
+							<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
-
 		<div class="houses__expanded" data-houses-expanded>
 			<div class="houses__expanded-grid">
 				<div class="houses__expanded-left">
-					<h3 class="houses__expanded-title">Dane lokalu:</h3>
+					<h3 class="houses__expanded-title">Dane lokalu <span data-house-expanded-number></span>:</h3>
 					<div class="houses__stats">
 						<div class="houses__stat"><span class="houses__stat-label">Cena:</span> <span class="houses__stat-value" data-house-price>—</span></div>
 						<div class="houses__stat"><span class="houses__stat-label">Powierzchnia:</span> <span class="houses__stat-value" data-house-area>—</span></div>
@@ -239,13 +253,14 @@ if ( empty( $materials_title ) ) {
 							<span class="houses__stat-label">Dostępność:</span>
 							<span class="houses__stat-value houses__availability" data-house-status>—</span>
 						</div>
-						<div class="houses__stat"><span class="houses__stat-label">Działka:</span> <span class="houses__stat-value" data-house-plot>—</span></div>
+						<div class="houses__stat"><span class="houses__stat-label">Powierzchnia działki:</span> <span class="houses__stat-value" data-house-plot>—</span></div>
 					</div>
 					<div class="houses__actions">
 						<a class="btn btn--outline" href="#" data-house-plan>
 							<span class="btn__text">Pobierz rzut nieruchomości</span>
 							<span class="btn__icon btn__icon--hamburger" aria-hidden="true"></span>
 						</a>
+
 					</div>
 				</div>
 				<div class="houses__expanded-right">
@@ -268,6 +283,50 @@ if ( empty( $materials_title ) ) {
 				</div>
 			</div>
 		</div>
+
+		<div class="houses__table-wrap" data-houses-table-wrap>
+			<div class="houses__table-inner">
+
+				<div class="houses__table-head houses__table-head--center">
+					<div class="section-label">
+						<p class="section-label__text">Zobacz wszystkie lokale</p>
+						<span class="section-label__line" aria-hidden="true"></span>
+					</div>
+
+					<h2 class="section-title">Lista lokali</h2>
+				</div>
+
+				<div class="houses__table-list" data-houses-table-list>
+					<div class="houses__table-scroll" role="region" aria-label="Tabela lokali" tabindex="0">
+						<table class="houses__table" data-houses-table>
+							<thead>
+								<tr>
+									<th scope="col">Oznaczenie domu (działka)</th>
+									<th scope="col">Powierzchnia lokalu</th>
+									<th scope="col">Liczba pokoi</th>
+									<th scope="col">Dostępność</th>
+									<th scope="col">Powierzchnia działki</th>
+									<th scope="col">Cena</th>
+									<th scope="col">Karta lokalu</th>
+								</tr>
+							</thead>
+							<tbody data-houses-table-body>
+								<tr>
+									<td colspan="7">Ładowanie…</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<button class="btn btn--primary houses__table-more" type="button" data-houses-table-more aria-expanded="false" hidden>
+					<span class="btn__text">Pokaż więcej</span>
+					<span class="btn__icon btn__icon--arrow" aria-hidden="true"></span>
+				</button>
+
+			</div>
+		</div>
+
 		<?php if ( ! empty( $materials ) && is_array( $materials ) ) : ?>
 			<div class="houses__materials">
 				<div class="houses__materials-grid">

@@ -82,12 +82,19 @@
 	--about-img-pad: 62px;
 	--about-col-gap: 20px;
 	--about-row-gap: 135px;
-	--about-img-left-w: 663px;
-	--about-img-left-h: 674px;
-	--about-img-right-w: 625px;
-	--about-img-right-h: 720px;
-	--about-media-left-w: var(--about-img-left-w);
-	--about-media-right-w: var(--about-img-right-w);
+
+	/* Wspólny rozmiar obrazów */
+	--about-img-w: 663px;
+	--about-img-h: 674px;
+
+	--about-img-left-w: var(--about-img-w);
+	--about-img-left-h: var(--about-img-h);
+	--about-img-right-w: var(--about-img-w);
+	--about-img-right-h: var(--about-img-h);
+
+	--about-media-left-w: var(--about-img-w);
+	--about-media-right-w: var(--about-img-w);
+
 	--about-desc-size: 20px;
 	--about-desc-line: 145%;
 

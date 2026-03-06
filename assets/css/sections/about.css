@@ -137,7 +137,7 @@
 	.about__img--right {
 		width: 100%;
 		height: auto;
-		aspect-ratio: 16 / 10;
+		aspect-ratio: 16 / 14;
 	}
 }
 
@@ -149,5 +149,100 @@
 
 	.about__row.about__row--bottom {
 		margin-top: 20px;
+	}
+}
+
+
+/* =========================================================
+   ABOUT — kreski przyklejone do zdjęcia (wrapper) — FINAL
+   ========================================================= */
+
+.about__media {
+	overflow: visible;
+}
+
+.about__img-wrap {
+	position: relative;
+	display: inline-block;
+	line-height: 0;
+	overflow: visible;
+}
+
+/* =========================
+   LEFT (3 kreski)
+   1) 155x3, wychodzi 60px
+   2) 412x3, wychodzi 25px
+   3) 155x3, wychodzi 40px
+   ========================= */
+
+/*
+	Element jest wysunięty poza zdjęcie o 60px (right: -60px),
+	a jego szerokość = 412 + 60 = 472px.
+	Dzięki temu kreski realnie mogą „wystawać”.
+*/
+.about__img-wrap--left::after {
+	content: "";
+	position: absolute;
+	top: -8px;
+	right: -60px; /* <-- wystawienie maksymalne (60px) */
+	width: 472px; /* 412 + 60 */
+	height: 19px;
+	z-index: 2;
+
+	background-repeat: no-repeat;
+	background-image:
+		linear-gradient(#37205E, #37205E),
+		linear-gradient(#37205E, #37205E),
+		linear-gradient(#37205E, #37205E);
+	background-size:
+		155px 3px,  /* linia 1 */
+		412px 3px,  /* linia 2 */
+		155px 3px;  /* linia 3 */
+
+	/*
+		Linia 1 ma wychodzić 60px => kończy się na prawym brzegu pseudo-elementu => right 0
+		Linia 2 ma wychodzić 25px => musi cofnąć się o (60 - 25) = 35px => right 35px
+		Linia 3 ma wychodzić 40px => musi cofnąć się o (60 - 40) = 20px => right 20px
+	*/
+	background-position:
+		right 0 top 0,
+		right 35px top 8px,
+		right 20px top 16px;
+}
+
+/* =========================
+   RIGHT (2 kreski)
+   1) 412x3, 30px od prawej krawędzi zdjęcia
+   2) 155x3, 10px od prawej krawędzi zdjęcia
+   ========================= */
+
+.about__img-wrap--right::after {
+	content: "";
+	position: absolute;
+	top: -18px;
+	right: 0;
+	width: 100%;
+	height: 11px;
+	z-index: 2;
+
+	background-repeat: no-repeat;
+	background-image:
+		linear-gradient(#37205E, #37205E),
+		linear-gradient(#37205E, #37205E);
+	background-size:
+		412px 3px,
+		155px 3px;
+
+	background-position:
+		right 30px top 0,
+		right 10px top 8px;
+}
+
+/* Na mobile/tablet bez dekoracji */
+@media (max-width: 1200px) {
+
+	.about__img-wrap--left::after,
+	.about__img-wrap--right::after {
+		display: none;
 	}
 }

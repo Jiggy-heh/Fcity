@@ -205,10 +205,8 @@
 	overflow: hidden;
 }
 
-.houses__choose-image {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+.houses__choose-image-wrap {
+	aspect-ratio: 921 / 488;
 }
 
 .houses__choose-area {
@@ -731,7 +729,7 @@
 
 .houses__availability {
 	display: inline-flex;
-	align-items: center;
+	align-items: flex-end;
 	justify-content: center;
 
 	gap: 8px;
@@ -758,7 +756,7 @@
 	background: currentColor;
 	opacity: 0.9;
 	position: relative;
-	top: 0;
+	top: -6px;
 }
 
 .houses__availability.is-available {
@@ -771,4 +769,291 @@
 	color: #B42318;
 	background: rgba(180, 35, 24, 0.10);
 	border-color: rgba(180, 35, 24, 0.25);
+}
+
+
+.houses__choose-grid {
+	margin-top: 24px;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 24px;
+	align-items: start;
+}
+
+.houses__choose-card {
+	background: #fff;
+	border: 2px solid transparent;
+	border-radius: 8px;
+	padding: 14px;
+	cursor: pointer;
+	transition: border-color .2s ease, box-shadow .2s ease;
+	text-align: left;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.houses__choose-cta {
+	margin-top: 16px;
+	display: flex;
+	justify-content: center;
+}
+
+.houses__choose-cta .btn {
+	width: 100%;
+	max-width: 230px;
+}
+
+.houses__choose-area {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+
+	.houses__choose-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
+
+	.houses__choose-card {
+		width: 100%;
+	}
+
+	.houses__choose-area {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 6px;
+	}
+
+	.houses__availability {
+		align-self: flex-start;
+	}
+
+	.houses__choose-cta .btn {
+		width: 100%;
+	}
+
+	.houses__choose-cta .btn__text {
+		white-space: normal;
+		text-align: center;
+	}
+}
+
+
+.houses__choose-label {
+	display: block;
+	margin-top: 12px;
+	font-family: Jost, sans-serif;
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 1.2;
+	color: var(--color-primary);
+}
+
+
+/* =========================================================
+   Houses table — collapsed like FAQ (peek + gradient + button)
+   ========================================================= */
+
+.houses__table-wrap{
+	margin-top: 60px;
+}
+
+/* GRID 1160px */
+.houses__table-inner{
+	width: 1200px;
+	max-width: 1200px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: var(--container-pad);
+	padding-right: var(--container-pad);
+}
+
+.houses__table-head{
+	margin-bottom: 24px;
+}
+
+.houses__table-head--center{
+	text-align: center;
+}
+
+.houses__table-head--center .section-label{
+	justify-content: center;
+}
+
+/* LIST wrapper (jak faq__list) */
+.houses__table-list{
+	position: relative;
+	overflow: hidden;
+
+	/* ustawiane z JS */
+	max-height: var(--houses-table-collapsed-h, none);
+
+	/* KLUCZ: daj miejsce na gradient, żeby nie “ucinał” tabeli */
+	padding-bottom: 64px;
+}
+
+.houses__table-list.is-expanded{
+	max-height: none;
+	padding-bottom: 0;
+}
+
+.houses__table-list:not(.is-expanded)::after{
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 64px;
+	pointer-events: none;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+}
+
+.houses__table-list.is-expanded::after{
+	display: none;
+}
+
+/* Scroll wrapper */
+.houses__table-scroll{
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	border-radius: 10px;
+	border: 1px solid rgba(55, 32, 94, 0.12);
+	background: var(--color-white);
+
+	/* KLUCZ: żeby narożniki działały przy overflow */
+	overflow: hidden;
+}
+
+/* Table */
+.houses__table{
+	width: 100%;
+	min-width: 960px;
+	border-collapse: collapse;
+	background: var(--color-white);
+	font-size: 15px;
+}
+
+/* Header */
+.houses__table thead th{
+	text-align: center;
+	font-weight: 700;
+	font-size: 13px;
+	letter-spacing: 0.02em;
+	color: rgba(55, 32, 94, 0.88);
+	padding: 16px 16px;
+	border-bottom: 2px solid rgba(238, 179, 92, 0.55);
+	white-space: nowrap;
+	background: linear-gradient(180deg, rgba(226, 214, 246, 0.55), rgba(247, 246, 251, 0.95));
+}
+
+.houses__table tbody td{
+	padding: 16px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	white-space: nowrap;
+	text-align: center;
+}
+
+.houses__table tbody tr:hover{
+	background: rgba(226, 214, 246, 0.22);
+}
+
+/* Status */
+.houses__table-status{
+	font-weight: 700;
+}
+
+.houses__table-status.is-available{
+	color: #0a8f4a;
+}
+
+.houses__table-status.is-sold{
+	color: #c53030;
+}
+
+/* Link */
+.houses__table-link{
+	color: var(--color-primary);
+	text-decoration: none;
+	font-weight: 700;
+}
+
+.houses__table-link:hover{
+	text-decoration: underline;
+}
+
+/* More (button like FAQ) */
+.houses__table-more{
+	width: 100%;
+	max-width: none;
+	margin-top: 20px;
+
+	/* KLUCZ: wyśrodkuj content przycisku (tekst + ikona) */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+}
+
+/* jeśli globalny .btn ma space-between, to to go nadpisze */
+.houses__table-more.btn{
+	justify-content: center;
+}
+
+.houses__table-more .btn__text{
+	text-align: center;
+}
+
+.houses__table-more .btn__icon{
+	flex: 0 0 auto;
+}
+
+.houses__table-more .btn__icon--arrow{
+	background-image: url("https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/faq_btn.svg");
+}
+
+/* Responsive */
+@media (max-width: 900px){
+	/* zostawiamy grid 1200, ale wpuszczamy go w ekran */
+	.houses__table-inner{
+		width: 1200px;
+		max-width: 100%;
+	}
+
+	.houses__table{
+		min-width: 0;
+	}
+
+	.houses__table thead{
+		display: none;
+	}
+
+	.houses__table tbody tr{
+		display: block;
+		padding: 16px 0;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	/* WYŚRODKOWANE na mobile: label + value */
+	.houses__table tbody td{
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		gap: 12px;
+		padding: 8px 16px;
+		border: none;
+		white-space: normal;
+	}
+
+	.houses__table tbody td::before{
+		content: attr(data-label);
+		font-weight: 700;
+		color: var(--color-grey);
+	}
 }

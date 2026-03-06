@@ -60,6 +60,7 @@ get_template_part( 'template-parts/components/lp-nav' );
 	}
 	?>
 
+
 	<?php if ( ! empty( $finish_standard_section ) ) : ?>
 	<div class="apla-sec">
 		<img class="apla-sec__bg" src="https://flixcity.kreatorzybiznesu.pl/wp-content/uploads/2026/02/apla_sec.svg" alt="" aria-hidden="true">

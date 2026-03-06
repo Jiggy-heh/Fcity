@@ -374,6 +374,7 @@ function flixcity_enqueue_section_scripts() {
 		);
 	}
 
+
 	/* Finish standard */
 	if ( file_exists( get_template_directory() . '/assets/js/finish-standard.js' ) ) {
 		wp_enqueue_script(
