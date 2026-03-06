@@ -120,10 +120,31 @@
 	--fc-form-w: 446px;
 	--fc-input-h: 42px;
 
+
+	/* Effects */
+	--fx-media-scale-hover: 1.04;
+	--fx-transition-smooth: 260ms ease;
+
+	/* Overlay */
+	--overlay-home-hero: linear-gradient(180deg, rgba(20, 12, 36, 0.45) 0%, rgba(20, 12, 36, 0.62) 100%);
+	--overlay-card-bottom-dark: linear-gradient(0deg, rgba(16, 16, 22, .88) 0%, rgba(16, 16, 22, .15) 65%, rgba(16, 16, 22, 0) 100%);
+
+	/* Radius */
+	--radius-card-lg: 10px;
+
+
+	/* Home investments */
+	--home-investments-grid-gap: 24px;
+	--home-investments-card-min-h: 430px;
+	--home-investments-card-min-h-mobile: 360px;
+	--home-investments-content-inset: 26px;
+
 	/* Gallery */
 	--gallery-grid-gap: 18px;
 	--gallery-grid-row-h: 245px;
 	--gallery-lightbox-half-w: min(600px, 46vw);
+
+
 
 	/* Expanded form */
 	--houses-content-max: 1228px;
